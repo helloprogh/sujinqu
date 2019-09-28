@@ -1,105 +1,116 @@
+
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+<meta charset="utf-8" >
+
 <title>JavaScript基础系列之原型链 | 苏进取</title>
-<meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650218435">
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650315743">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div class="main">
-      <div class="main-content">
-        <div class="site-header">
-  <a href="https://helloprogh.github.io/sujinqu/">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650218435" alt="">
-  </a>
-  <h1 class="site-title">
-    苏进取
-  </h1>
-  <p class="site-description">
-    凝视深渊
-  </p>
-  <div class="menu-container">
-    
-      
-        <a href="/" class="menu">
-          首页
-        </a>
-      
-    
-      
-        <a href="/archives" class="menu">
-          归档
-        </a>
-      
-    
-      
-        <a href="/tags" class="menu">
-          标签
-        </a>
-      
-    
-      
-        <a href="/post/about" class="menu">
-          关于
-        </a>
-      
-    
-  </div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://helloprogh.github.io/sujinqu/">
+        <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650315743" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://helloprogh.github.io/sujinqu/">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
   </div>
 </div>
 
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="menu purple-link">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
         <div class="post-detail">
-          <article class="post">
-            <h2 class="post-title">
-              JavaScript基础系列之原型链
-            </h2>
-            <div class="post-info">
-              <span>
-                2019-05-08
-              </span>
-              <span>
-                10 min read
-              </span>
-              
-                <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="post-tag">
-                  # JavaScript
-                </a>
-              
-                <a href="https://helloprogh.github.io/sujinqu//tag/UiEY_5bYq" class="post-tag">
-                  # 原型
-                </a>
-              
-                <a href="https://helloprogh.github.io/sujinqu//tag/tp9XdLXEC" class="post-tag">
-                  # 原型链
-                </a>
-              
-            </div>
+          
+          <h2 class="post-title">JavaScript基础系列之原型链</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2019-05-08</span>
             
-            <div class="post-content-wrapper">
-              <div class="post-content">
-                <h2 id="前言">前言</h2>
+              <span>
+                <i class="icon-pricetags-outline"></i>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z">
+                    JavaScript
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/UiEY_5bYq">
+                    原型
+                    
+                      ，
+                    
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/tp9XdLXEC">
+                    原型链
+                    
+                  </a>
+                
+              </span>
+            
+          </div>
+          <div class="post-content">
+            <h2 id="前言">前言</h2>
 <p>原型和原型链，说是两个词，其实理解一个就可以了。这两个概念是同时存在的，不可能抛开一个去谈论另外一个，或者说这两个概念结合在一起才会发挥作用，甚至原型的存在是因为有原型链的存在，不在原型链上的原型只能称之为对象。</p>
 <h2 id="原型链">原型链</h2>
 <p>先来说说原型链是个什么东东，说起链我们现在脑海中描绘一下自己对链这个字的第一反应是什么，是社会我大哥的大金链？<br>
@@ -206,108 +217,57 @@ console.log('a的原型是b', Object.getPrototypeOf(c) === b);  //true
 <h2 id="结论">结论</h2>
 <p>通常我们在谈论原型的时候，应该都是在谈论这种设计模式，这应该是一种思想，一种解决问题的方式，我们对它的理解不应该仅仅停留在对机制的理解上。这种模式的优点在于你只需要在原型上的添加某个属性，指向该原型的所有对象都会具有这个属性，而不用一个一个的去给这些对象添加这个属性。</p>
 
-              </div>
-              <div class="toc-container">
-                <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
-<li><a href="#%E5%8E%9F%E5%9E%8B%E9%93%BE">原型链</a>
-<ul>
-<li><a href="#%E4%B8%BE%E4%B8%AA%E6%A0%97%E5%AD%90">举个栗子</a></li>
-<li><a href="#%E5%8E%9F%E5%9E%8B%E9%93%BE%E7%9A%84%E7%89%B9%E5%BE%81">原型链的特征</a></li>
-</ul>
-</li>
-<li><a href="#__proto__%E5%92%8Cprototype%E7%9A%84%E5%85%B3%E7%B3%BB">__proto__和prototype的关系</a>
-<ul>
-<li><a href="#prototype">prototype</a></li>
-<li><a href="#__proto__">__proto__</a></li>
-<li><a href="#%E5%8E%9F%E5%9E%8B%E9%93%BE%E5%85%B3%E7%B3%BB%E5%9B%BE">原型链关系图</a></li>
-</ul>
-</li>
-<li><a href="#%E6%8C%87%E5%AE%9A%E5%AF%B9%E8%B1%A1%E5%8E%9F%E5%9E%8B%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F">指定对象原型的几种方式</a>
-<ul>
-<li><a href="#%E9%9D%9E%E6%A0%87%E5%87%86%E6%93%8D%E4%BD%9C">非标准操作</a></li>
-<li><a href="#%E6%A0%87%E5%87%86api%E6%93%8D%E4%BD%9C">标准API操作</a>
-<ul>
-<li><a href="#objectsetprototypeof">Object.setPrototypeOf</a></li>
-<li><a href="#reflectsetprototypeof">Reflect.setPrototypeOf</a></li>
-<li><a href="#objectcreate">Object.create</a></li>
-</ul>
-</li>
-<li><a href="#%E7%89%B9%E5%AE%9A%E5%9C%BA%E6%99%AF%E6%93%8D%E4%BD%9C">特定场景操作</a></li>
-</ul>
-</li>
-<li><a href="#%E7%BB%93%E8%AE%BA">结论</a></li>
-</ul>
-</li>
-</ul>
-
-              </div>
-            </div>
-          </article>
+          </div>
         </div>
 
         
           <div class="next-post">
-            <div class="next">下一篇</div>
-            <a href="https://helloprogh.github.io/sujinqu//post/closureBylet">
+            <a class="purple-link" href="https://helloprogh.github.io/sujinqu//post/closureBylet">
               <h3 class="post-title">
-                ECMAScript基础之通过let说闭包
+                下一篇：ECMAScript基础之通过let说闭包
               </h3>
             </a>
           </div>
-        
+          
+      </div>
 
-        
+      
 
-        <div class="site-footer">
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
-  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+      <div class="site-footer">
+  <div class="slogan">凝视深渊</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
 </div>
 
-<script>
-  hljs.initHighlightingOnLoad()
 
-  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+    </div>
+    <script type="application/javascript">
 
-  // This should probably be throttled.
-  // Especially because it triggers during smooth scrolling.
-  // https://lodash.com/docs/4.17.10#throttle
-  // You could do like...
-  // window.addEventListener("scroll", () => {
-  //    _.throttle(doThatStuff, 100);
-  // });
-  // Only not doing it here to keep this Pen dependency-free.
+hljs.initHighlightingOnLoad()
 
-  window.addEventListener("scroll", event => {
-    let fromTop = window.scrollY;
-
-    mainNavLinks.forEach((link, index) => {
-      let section = document.getElementById(decodeURI(link.hash).substring(1));
-      let nextSection = null
-      if (mainNavLinks[index + 1]) {
-        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
-      }
-      if (section.offsetTop <= fromTop) {
-        if (nextSection) {
-          if (nextSection.offsetTop > fromTop) {
-            link.classList.add("current");
-          } else {
-            link.classList.remove("current");    
-          }
-        } else {
-          link.classList.add("current");
-        }
-      } else {
-        link.classList.remove("current");
-      }
-    });
-  });
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
 
 </script>
 
-      </div>
-    </div>
+
+
+
   </body>
 </html>
