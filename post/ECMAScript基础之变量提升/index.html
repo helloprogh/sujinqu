@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>ECMAScript基础之变量提升 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ECMAScript基础之变量提升</h2>
+            <div class="post-date">2019-06-19</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>js 中存在变量提升，前端er基本都知道，但是这个变量提升的是什么，什么阶段提升的，var，let和function等关键字声明的变量在if条件语句中是否有提升，提升是否能穿透条件语句的执行体？不知道有多少人对这些有深入理解。</p>
+<p>先上代码：</p>
+<pre><code class="language-javascript">var b = true;
+if(b) {
+    function a() {
+        console.log('a');
+    }
+} else {
+    function a() {
+        console.log('b');
+    }
+}
+a();
+</code></pre>
+<p>当你读完这段代码后，如果心中没有准确且确定的知道它是怎么运行的，那么你本文可能对你有所帮助。</p>
+<h2 id="js-的预处理">js 的预处理</h2>
+<p>JS 执行前，会对代码进行预处理，预处理过程会提前处理var、function声明、class、const、let等关键字声明的变量。</p>
+<h2 id="声明提升规则">声明提升规则</h2>
+<p>在变量的声明提升中存在一些平常我们可能不太注意的细节，这里将声明提升的具体行为分成三类进行总结，分别是：</p>
+<ul>
+<li>var 声明</li>
+<li>function 声明</li>
+<li>class、let 和 const声明</li>
+</ul>
+<h3 id="var-声明">var 声明</h3>
+<p>var 声明的变量提升时，只管在当前作用域内声明这个变量并初始化其值为undefined。来看一个实际的例子：</p>
+<pre><code class="language-javascript">function s() {
+    console.log(a);
+    var a = 'ss';
+}
+
+s();
+</code></pre>
+<p>这段代码打印的结果是undefined，由于 var a在预处理时被提升至函数s的作用域最开始，并初始化为 undefined，所以打印结果是undefined。</p>
+<p>再来看另一段</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    if(false) {
+        var a = 'ss';
+    }
+}
+test();
+</code></pre>
+<p>这段代码的打印的结果也是 undefined，虽然判断条件为 false 的语句永远不会被执行，但是 var 的声明提升是不管这些的，它的提升可以穿透条件语句直达当前作用域的顶部，至于执不执行声明的提升是不管的。</p>
+<p>总之 var 的提升就一句，提升到当前作用域的顶部，并初始化其值为undefined。</p>
+<h3 id="function-声明">function 声明</h3>
+<p>相较于 var 的提升简单明了，function 的提升则要复杂一些，考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    function a() {
+        
+    }
+}
+test();
+</code></pre>
+<p>这段代码比较简单，会打印函数出一个函数a，而不是undefined，也就是说函数声明不仅仅是变量声明的提升，同时给变量 赋值了。那么是不是无论何时，函数声明的提升都是及提升变量声明还赋值呢？考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log('函数a', a);
+    if(false) {
+        function a() {
+            
+        }
+    }
+}
+
+test();
+</code></pre>
+<p>这段代码的打印结果是undefined，如果没有函数声明，直接打印a，这里会抛出 not defined 的错误。</p>
+<p>这说明在 if 语句中 function 的声明名仍然会提升，只是被赋值为 undefined 了，其具体的赋值发生在了代码执行阶段。</p>
+<h3 id="class-let-和-const声明">class、let 和 const声明</h3>
+<p>class、let 和 const的声明提升具有相同特征，所以这里我只说以下 let。</p>
+<p>先考虑下面这段的代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    let a = 'aLet';
+}
+test();
+</code></pre>
+<p>嗯，这段代码会抛错，就像这样<br>
+<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt=""></p>
+<p>现在去网上搜一下关于 let 的变量提升的内容，仍然会看到很多说 let 不存在变量声明提升的说法，给出的理由是，既然提升了，为什么在声明之前使用该变量会报错呢？下面就说一说为什么认为 let 是存在提升的。 考虑下面代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(c)
+    var c = 'tVar';
+    let c = 'cLet';
+};
+test();
+</code></pre>
+<p>这段代码会抛处错误，告诉你已经存在同名变量了，不能再定义c，按道理来说正常结果应该会打印 undefined 才对，毕竟var c 声明的 c 会提升并被赋值为 undefined 。如果去掉let c的定义，则会按我们预期的打印 undefined ，也就是说出现在后面的 let 声明影响了前面语句的结果。</p>
+<p>这说明 let 声明的变量在预处理阶段仍然会被处理，只不过这种处理只是单纯的在声明作用域中提升了变量的声明，而没有给变量初始化，而在变量被初始化之前是无法使用的，也就出现在 let 声明之前使用变量会抛出错误。</p>
+<p>关于 let 的声明提升还有一个叫暂时死区的名词，其实这个词非常好理解，let 声明的变量在被赋值之前是无法使用的，那么在变量被赋值之前到变量所在作用域范围开头的那段位置称之为这个变量的死区，但是这个变量的作用域不会被影响，当它被赋值后，即使是在它被定义的位置之前调用这变量也依然是可以的，这种不可用是暂时的，所以叫做暂时死区。这里讨论暂时死区没有太大意义，知道是怎么回事就行。</p>
+<h2 id="声明提升的优先级">声明提升的优先级</h2>
+<p>声明提升的优先级发生在同一作用域中声明同名变量的情况下，所以let，const，class 声明的变量就不需要讨论这个问题了。只需考虑 var 和 function 声明的变量。</p>
+<p>对于同名的 var 声明，Javascript 采用的是忽略原则，后声明的会被忽略，变量声明和赋值操作可以写在一起，但是只有声明会被提升，提升后变量的值默认为undefined，结果是在赋值操作执行前变量的值必为undefined</p>
+<p>对于同名的 function 声明，Javascrip t采用的是覆盖原则，先声明的会被覆盖，因为函数在声明时会指定函数的内容，所以同一作用域下一系列同名函数声明的最终结果是调用时函数的内容和最后一次函数声明相同，考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    a();
+    function a() {
+        console.log('a1')
+    }
+    function a() {
+        console.log('a2')
+    }
+ }
+ test();
+</code></pre>
+<p>打印的结果是a2，说明后面定义的函数覆盖了前面的函数。</p>
+<p>对于同名的函数声明和变量声明，采用的是忽略原则，由于在提升时函数声明会提升到变量声明之前，变量声明一定会被忽略，所以结果是函数声明有效。考虑下面代码：</p>
+<pre><code class="language-javascript">function test1() {
+    console.log(typeof a);
+    var a = 'aVar';
+    function a() {
+        
+    }
+}
+test1();
+
+//先声明函数后声明变量，证明上边的例子不是function覆盖了变量
+function test2() {
+    console.log(typeof a);
+    function a() {
+        
+    }
+    var a = 'aVar';
+}
+test2()
+</code></pre>
+<p>test1和test2运行的结果均是function，这表明函数的变量声明是优先的。</p>
+<p>综合上面的描述，函数声明提升的优先级是高于var 声明变量提升的。</p>
+<h2 id="结论">结论</h2>
+<p>尽管本文是在讨论变量提升，但是我本人并不提倡在变量声明之前使用变量声明之前使用变量这一违反人类直觉的做法，在实际编码中我们还是应该先声明变量后使用它。掌握变量提升有助于我们更好的理解代码，避免在遇到提升的用法时无法理解。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_" class="tag">
+                    ECMAScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/Er05KZBt8" class="tag">
+                    变量提升
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_IIFE">
+                  <h3 class="post-title">
+                    JavaScript基础系列之IIFE为什么不会污染全局变量
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

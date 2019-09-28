@@ -1,45 +1,1593 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://helloprogh.github.io/sujinqu/</id>
-    <title>Gridea</title>
-    <updated>2019-09-28T05:17:03.095Z</updated>
+    <title>苏进取</title>
+    <updated>2019-09-28T05:46:12.611Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://helloprogh.github.io/sujinqu/"/>
     <link rel="self" href="https://helloprogh.github.io/sujinqu//atom.xml"/>
-    <subtitle>温故而知新</subtitle>
+    <subtitle>凝视深渊</subtitle>
     <logo>https://helloprogh.github.io/sujinqu//images/avatar.png</logo>
     <icon>https://helloprogh.github.io/sujinqu//favicon.ico</icon>
-    <rights>All rights reserved 2019, Gridea</rights>
+    <rights>All rights reserved 2019, 苏进取</rights>
     <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/hello-gridea</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/hello-gridea">
+        <title type="html"><![CDATA[ECMAScript基础之promise chain]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之promise chain</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之promise chain">
         </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
+        <updated>2019-07-11T13:08:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>最近因为对 promise 的状态依赖理解有偏差，导致在开发过程中花费了3个小时的时间才发现错误。感觉浪费时间了，所以结合标准及实践结果对 promise 的状态依赖做了一个总结。</p>
+<p>问题代码大致是这样的：</p>
+<pre><code class="language-javascript">// 假设promise为请求错误回调
+ let promise = new Promise((resolve, reject) =&gt; {
+    reject('400'); 
+ });
+ 
+ // 统一的响应拦截处理
+ promise.then((res) =&gt; {
+    console.log('promise injector resolved', res) 
+ }, (err) =&gt; {
+    console.log('promise injector rejected', err) 
+ })
+ // 请求调用处的业务响应处理
+ .then((res) =&gt; {
+    console.log('promise resolved', res) 
+ }, (err) =&gt; {
+    console.log('promise rejected', err) 
+ })
+ 
+</code></pre>
+<p>上面代码中表现的场景是，错误请求经过请求响应拦截器的统一处理后，业务逻辑本身再根据请求状态来进行一些其他的处理。本来按照我对promise的理解，这样是没有问题的。实际上这里的问题是，业务中的请求响应处理永远只会走成功回调，而不会走失败回调。因为在进行统一的响应拦截处理的时候，就已经丢失了 promise 的状态了。</p>
+<h2 id="promise-的三种状态">promise 的三种状态</h2>
+<p>promise共有是三种状态：</p>
+<ul>
+<li>Pending - promise 初始化状态</li>
+<li>Fulfilled - 成功</li>
+<li>Rejected - 失败</li>
+</ul>
+<blockquote>
+<p>这三种状态是 Promises/A+ 中描述状态的术语</p>
+</blockquote>
+<p>当我们创建一个 promise 时，它的状态是 Pending，然后随着异步任务的执行，它的状态一定会变成 Fulfilled 和 Rejected 中的一种，且它的状态不会再发生任何变化（这一点很重要，后面捋清楚 promise.then() 的返回值就靠这个特性了）。</p>
+<h2 id="promisethen-返回的是一个新的-promise">promise.then() 返回的是一个新的 promise</h2>
+<p>先来一代码：</p>
+<pre><code class="language-javascript">let promise = Promise.resolve('test');
+
+let thenPromise = promise.then( res =&gt;{
+    console.log(res)
+});
+console.log(promise === thenPromise);
+console.log(thenPromise);
+</code></pre>
+<p>运行结果如下：<br>
+<img src="https://user-gold-cdn.xitu.io/2019/7/9/16bd7432c2c0501f?w=329&amp;h=211&amp;f=png&amp;s=16376" alt=""></p>
+<p>从运行结果中我们不难得出两点：</p>
+<ol>
+<li>promise.then() 返回的 promise 和调用 .then() 的 promise 不是同一个</li>
+<li>promise.then() 返回的 promise 状态为 resolved，对应本文中描述 promise 状态的 Fulfilled。</li>
+</ol>
+<p>promise.then() 返回的是一个新的 Promise 的实例对象，而 promise 是能够能表示状态的，这样就可以形成一条状态的依赖链。也就能将多个任务之间的依赖及执行顺序表示出来了，从而将异步任务的回调嵌套转化成为一条扁平的链条。</p>
+<h2 id="promise-chain">promise chain</h2>
+<p>promise chain 说白了就是个 promise 的调用链，代码形式大致如下：</p>
+<pre><code class="language-javascript">var promise1 = Promise.reject('test');
+promise1.then(function(res) {
+    console.log('fulfilled1', res)
+}, function(err) {
+    console.log('rejected1', err)
+    return err;
+}).then(function(res) {
+    console.log('fulfilled2', res)
+}, function(err) {
+    console.log('rejected2', err)
+})
+</code></pre>
+<p>这样的链式调用方式，很好的将多个存在依赖关系的异步任务，将难看回调嵌套转化成了一条更易于理解的扁平链条。从而解决了所谓回调地狱的问题。</p>
+<h3 id="promisethen-回调函数的两种返回值">promise.then() 回调函数的两种返回值</h3>
+<p>当我们创建了一个 promise 之后，就可以使用 promise.then() 来注册，Fulfilled 和 Rejected 状态对应的执行函数了。类似下面这样：</p>
+<pre><code class="language-javascript">var promise = new Promise((resolve, reject)=&gt;{
+    resolve('ok');
+});
+promise.then((res)=&gt;{
+    console.log('fulfilled', res)
+}, (err)=&gt;{
+    console.log('rejected', err)
+})
+</code></pre>
+<p>promise.then() 注册的回调函数可以返回不同的值，分为以下两种：</p>
+<ul>
+<li>返回除Promise 实例对象以外的任何值</li>
+<li>Promise 实例对象</li>
+</ul>
+<h2 id="promisethen-回调函数返回值对-promise-chain-的影响">promise.then() 回调函数返回值对 promise chain 的影响</h2>
+<p>promise.then() 回调函数的返回值决定了其返回的 promise，大致分为以下两种情形：</p>
+<ol>
+<li>回调函数返回除 Promise 实例对象之外的任何值，决定返回的 promise 注册的回调函数的实参</li>
+<li>回调函数返回 Promise 实例对象，决定 promise.then() 返回的 promise 的状态和其注册的回调函数的实参</li>
+</ol>
+<blockquote>
+<p>注意： 这里的回调函数指的是 promise.then() 注册的回调函数，且是指的是被调用的函数，与是成功回调还是失败回调无关</p>
+</blockquote>
+<h3 id="被执行的回调函数返回除-promise-实例对象之外的任何值">被执行的回调函数返回除 Promise 实例对象之外的任何值</h3>
+<p>当 promise.then() 注册的回调函数返回除promise以外的值时，返回的值会被当做 promise.then() 返回的新的 promise 使用 .then() 注册的回调函数的传入值。</p>
+<p>当回调函数未返回值时，考虑下面代码：</p>
+<pre><code class="language-javascript">let promise = Promise.resolve();
+promise.then(()=&gt;{
+    console.log('promise resolved')
+}, ()=&gt;{
+    console.log('promise rejected')
+})
+.then((value)=&gt;{
+    console.log('promise resolved1')
+    console.log(value)
+}, (err)=&gt;{
+    console.log('promise rejected1')
+    console.log(err)
+})
+
+// promise resolved
+// promise resolved1
+// undefined
+
+let promise1 = Promise.reject();
+promise1.then(()=&gt;{
+    console.log('promise1 resolved')
+}, ()=&gt;{
+    console.log('promise1 rejected')
+})
+.then((value)=&gt;{
+    console.log('promise1 resolved1')
+    console.log(value)
+}, (err)=&gt;{
+    console.log('promise1 rejected1')
+    console.log(err)
+})
+
+// promise1 rejected
+// promise1 resolved1
+// undefined
+</code></pre>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be146e8e640d74?w=523&amp;h=126&amp;f=png&amp;s=5874" alt=""><br>
+运行结果如上，为了方便阅读结果，我们把打印顺序调换一下，整理如下</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be14970be44383?w=354&amp;h=117&amp;f=png&amp;s=4668" alt=""></figure>
+<p>promise 注册的回调运行了成功回调，而后返回了一个成功状态的promise，这个返回的 promise 注册的回调运行了成功回调，回调函数的实参是 undefined；promise1 注册的回调运行了失败回调，而后同样返回了一个成功状态的 promise ，这个返回的 promise 注册的回调运行了成功回调，回调函数的实参是 undefined</p>
+<blockquote>
+<p>js 函数执行后默认返回值为undefined</p>
+</blockquote>
+<p>再来看看返回其他值的情况：</p>
+<pre><code class="language-javascript">let promise = Promise.resolve();
+promise.then(()=&gt;{
+    console.log('promise resolved')
+    return 'value'
+}, ()=&gt;{
+    console.log('promise rejected')
+    return 'err'
+})
+.then((value)=&gt;{
+    console.log('promise resolved1')
+    console.log(value)
+}, (err)=&gt;{
+    console.log('promise rejected1')
+    console.log(err)
+})
+// promise resolved
+// promise resolved1
+// value
+
+let promise1 = Promise.reject();
+promise1.then(()=&gt;{
+    console.log('promise1 resolved')
+    return 'value'
+}, ()=&gt;{
+    console.log('promise1 rejected')
+    return 'err'
+})
+.then((value)=&gt;{
+    console.log('promise1 resolved1')
+    console.log(value)
+}, (err)=&gt;{
+    console.log('promise1 rejected1')
+    console.log(err)
+})
+// promise1 rejected
+// promise1 resolved1
+// err
+</code></pre>
+<p>promise.then() 注册的回调函数，运行的是成功回调，且返回了字符串 “value”，promise.then() 函数返回了一个成功状态的 promise， 返回的 promise 注册的回调函数运行了成功回调，回调函数的实参是字符串“value”；promise1.then() 注册的回调函数，运行的是失败回调，且返回了字符串 “err”，promise1.then() 函数返回了一个成功状态的 promise， 返回的 promise 注册的回调函数运行了成功回调，回调函数的实参是字符串“err”</p>
+<p>从上面两段示例代码及其运行结果，不难得出如下结论：</p>
+<ol>
+<li>当 promise.then() 注册的回调函数返回的不是一个 Promise 示例对象时（代码只示例了返回字符串和undefined的情况，其他情况有兴趣的同学可以验证下返回其他类型的值），promise.then() 返回的是一个 Fulfilled 状态的新的 Promise 实例</li>
+<li>这个成功回调的实参就是上一个运行的回调函数的返回值</li>
+</ol>
+<h3 id="被执行的回调函数返回-promise-实例对象">被执行的回调函数返回 Promise 实例对象</h3>
+<p>当 promise.then() 注册的被运行的回调函数返回一个 Promise 实例的时候，回调返回的 Promise 实例的最终的状态会决定 promise.then() 函数返回的这个新的 promise 的状态。且promise.then() 函数返回的 promise 注册的回调函数的实参是由 Promise 实例对象 resolve 或 reject 传递的参数决定的。</p>
+<p>考虑如下代码：</p>
+<pre><code class="language-javascript">let promiseValue = Promise.reject('promiseValue err');
+
+let promise = Promise.resolve();
+let promiseThen = promise.then(()=&gt;{
+    console.log('promise resolved');
+    return promiseValue;
+})
+promiseThen.then((res)=&gt;{
+    console.log('promise resolved1');
+    console.log(res)
+}, (err)=&gt;{
+    console.log('promise rejected1');
+    console.log(err);
+})
+
+// promise resolved
+// promise rejected1
+// promiseValue err
+
+console.log(promiseThen === promiseValue)
+
+// false
+</code></pre>
+<p>promise 执行成功状态回调，回调函数返回失败状态的 Promise 实例对象 promiseValue，且其 rejecte 传入的值是字符串 “promiseValue err”。因为 promiseValue 的状态是 rejected 所以 promise.then() 返回的新的 Promise 实例（promiseThen === promiseValue 的结果是 false 证明promise.then()返回的）promiseThen 的状态是 rejected，promiseThen 注册的失败回调被调用，打印的实参为字符串“promiseValue err”。</p>
+<p>promise.then() 注册的被执行的回调函数返回 Promise 实例对象时：</p>
+<ol>
+<li>promise.then() 返回一个新的 Promise 实例对象，这个实例对象会等待回调函数返回 Promise 实例对象的状态变成Fulfilled 或 Rejected 中的一种后返回，且状态和回调函数返回 Promise 实例对象的状态一致</li>
+<li>promise.then() 返回的 Promise 实例对象，注册的回调函数被执行的时候接受的实参是由回调函数返回 Promise 实例对象传递的结果决定</li>
+</ol>
+<h2 id="总结">总结</h2>
+<p>正是因为 promise.then() 返回的是一个新的 Promise 实例，且这个实例可以向后传递上一个依赖 promise 的异步任务的执行状态和其要传递的数据。这样的链式调用机制，解决了存在依赖关系的异步任务只能在回调函数中不断嵌套的最后导致代码难以维护的问题。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ECMAScript基础之变量提升]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升">
+        </link>
+        <updated>2019-06-19T13:08:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>js 中存在变量提升，前端er基本都知道，但是这个变量提升的是什么，什么阶段提升的，var，let和function等关键字声明的变量在if条件语句中是否有提升，提升是否能穿透条件语句的执行体？不知道有多少人对这些有深入理解。</p>
+<p>先上代码：</p>
+<pre><code class="language-javascript">var b = true;
+if(b) {
+    function a() {
+        console.log('a');
+    }
+} else {
+    function a() {
+        console.log('b');
+    }
+}
+a();
+</code></pre>
+<p>当你读完这段代码后，如果心中没有准确且确定的知道它是怎么运行的，那么你本文可能对你有所帮助。</p>
+<h2 id="js-的预处理">js 的预处理</h2>
+<p>JS 执行前，会对代码进行预处理，预处理过程会提前处理var、function声明、class、const、let等关键字声明的变量。</p>
+<h2 id="声明提升规则">声明提升规则</h2>
+<p>在变量的声明提升中存在一些平常我们可能不太注意的细节，这里将声明提升的具体行为分成三类进行总结，分别是：</p>
+<ul>
+<li>var 声明</li>
+<li>function 声明</li>
+<li>class、let 和 const声明</li>
+</ul>
+<h3 id="var-声明">var 声明</h3>
+<p>var 声明的变量提升时，只管在当前作用域内声明这个变量并初始化其值为undefined。来看一个实际的例子：</p>
+<pre><code class="language-javascript">function s() {
+    console.log(a);
+    var a = 'ss';
+}
+
+s();
+</code></pre>
+<p>这段代码打印的结果是undefined，由于 var a在预处理时被提升至函数s的作用域最开始，并初始化为 undefined，所以打印结果是undefined。</p>
+<p>再来看另一段</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    if(false) {
+        var a = 'ss';
+    }
+}
+test();
+</code></pre>
+<p>这段代码的打印的结果也是 undefined，虽然判断条件为 false 的语句永远不会被执行，但是 var 的声明提升是不管这些的，它的提升可以穿透条件语句直达当前作用域的顶部，至于执不执行声明的提升是不管的。</p>
+<p>总之 var 的提升就一句，提升到当前作用域的顶部，并初始化其值为undefined。</p>
+<h3 id="function-声明">function 声明</h3>
+<p>相较于 var 的提升简单明了，function 的提升则要复杂一些，考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    function a() {
+        
+    }
+}
+test();
+</code></pre>
+<p>这段代码比较简单，会打印函数出一个函数a，而不是undefined，也就是说函数声明不仅仅是变量声明的提升，同时给变量 赋值了。那么是不是无论何时，函数声明的提升都是及提升变量声明还赋值呢？考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log('函数a', a);
+    if(false) {
+        function a() {
+            
+        }
+    }
+}
+
+test();
+</code></pre>
+<p>这段代码的打印结果是undefined，如果没有函数声明，直接打印a，这里会抛出 not defined 的错误。</p>
+<p>这说明在 if 语句中 function 的声明名仍然会提升，只是被赋值为 undefined 了，其具体的赋值发生在了代码执行阶段。</p>
+<h3 id="class-let-和-const声明">class、let 和 const声明</h3>
+<p>class、let 和 const的声明提升具有相同特征，所以这里我只说以下 let。</p>
+<p>先考虑下面这段的代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(a);
+    let a = 'aLet';
+}
+test();
+</code></pre>
+<p>嗯，这段代码会抛错，就像这样<br>
+<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt=""></p>
+<p>现在去网上搜一下关于 let 的变量提升的内容，仍然会看到很多说 let 不存在变量声明提升的说法，给出的理由是，既然提升了，为什么在声明之前使用该变量会报错呢？下面就说一说为什么认为 let 是存在提升的。 考虑下面代码：</p>
+<pre><code class="language-javascript">function test() {
+    console.log(c)
+    var c = 'tVar';
+    let c = 'cLet';
+};
+test();
+</code></pre>
+<p>这段代码会抛处错误，告诉你已经存在同名变量了，不能再定义c，按道理来说正常结果应该会打印 undefined 才对，毕竟var c 声明的 c 会提升并被赋值为 undefined 。如果去掉let c的定义，则会按我们预期的打印 undefined ，也就是说出现在后面的 let 声明影响了前面语句的结果。</p>
+<p>这说明 let 声明的变量在预处理阶段仍然会被处理，只不过这种处理只是单纯的在声明作用域中提升了变量的声明，而没有给变量初始化，而在变量被初始化之前是无法使用的，也就出现在 let 声明之前使用变量会抛出错误。</p>
+<p>关于 let 的声明提升还有一个叫暂时死区的名词，其实这个词非常好理解，let 声明的变量在被赋值之前是无法使用的，那么在变量被赋值之前到变量所在作用域范围开头的那段位置称之为这个变量的死区，但是这个变量的作用域不会被影响，当它被赋值后，即使是在它被定义的位置之前调用这变量也依然是可以的，这种不可用是暂时的，所以叫做暂时死区。这里讨论暂时死区没有太大意义，知道是怎么回事就行。</p>
+<h2 id="声明提升的优先级">声明提升的优先级</h2>
+<p>声明提升的优先级发生在同一作用域中声明同名变量的情况下，所以let，const，class 声明的变量就不需要讨论这个问题了。只需考虑 var 和 function 声明的变量。</p>
+<p>对于同名的 var 声明，Javascript 采用的是忽略原则，后声明的会被忽略，变量声明和赋值操作可以写在一起，但是只有声明会被提升，提升后变量的值默认为undefined，结果是在赋值操作执行前变量的值必为undefined</p>
+<p>对于同名的 function 声明，Javascrip t采用的是覆盖原则，先声明的会被覆盖，因为函数在声明时会指定函数的内容，所以同一作用域下一系列同名函数声明的最终结果是调用时函数的内容和最后一次函数声明相同，考虑下面这段代码：</p>
+<pre><code class="language-javascript">function test() {
+    a();
+    function a() {
+        console.log('a1')
+    }
+    function a() {
+        console.log('a2')
+    }
+ }
+ test();
+</code></pre>
+<p>打印的结果是a2，说明后面定义的函数覆盖了前面的函数。</p>
+<p>对于同名的函数声明和变量声明，采用的是忽略原则，由于在提升时函数声明会提升到变量声明之前，变量声明一定会被忽略，所以结果是函数声明有效。考虑下面代码：</p>
+<pre><code class="language-javascript">function test1() {
+    console.log(typeof a);
+    var a = 'aVar';
+    function a() {
+        
+    }
+}
+test1();
+
+//先声明函数后声明变量，证明上边的例子不是function覆盖了变量
+function test2() {
+    console.log(typeof a);
+    function a() {
+        
+    }
+    var a = 'aVar';
+}
+test2()
+</code></pre>
+<p>test1和test2运行的结果均是function，这表明函数的变量声明是优先的。</p>
+<p>综合上面的描述，函数声明提升的优先级是高于var 声明变量提升的。</p>
+<h2 id="结论">结论</h2>
+<p>尽管本文是在讨论变量提升，但是我本人并不提倡在变量声明之前使用变量声明之前使用变量这一违反人类直觉的做法，在实际编码中我们还是应该先声明变量后使用它。掌握变量提升有助于我们更好的理解代码，避免在遇到提升的用法时无法理解。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript基础系列之IIFE为什么不会污染全局变量]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_IIFE</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_IIFE">
+        </link>
+        <updated>2019-05-31T14:46:12.000Z</updated>
+        <content type="html"><![CDATA[<p>在开发过程中见到的IIFE，函数表达式都是匿名的，如果我们把它写成命名函数表达式，那全局作用域中岂不是多了一个变量，这样又怎么能保证不会污染全局变量呢？</p>
+<p>通常我们在谈论IIFE时，都是在谈论它的用法，模块化，闭包等等，却少有提及它为什么可以拿来做模块化，为什么不会污染全局变量。</p>
+<p>本文虽然是在说IIFE，但是并不会过多的介绍它的使用，或者其实践意义（毕竟在标准中已经ES6的今天讨论这个意义不是很大），更多的是讨论这种写法的本身在语法上会成立的原因，为什么可以在块级作用域出现之前替代它，及其中涉及到的点。</p>
+<h2 id="阅读判定">阅读判定</h2>
+<p>考虑下面代码</p>
+<pre><code class="language-javascript">(function a(){
+    console.log('run a');
+})();
+console.log(a);
+</code></pre>
+<p>这段代码运行在严格模式下，这里说一下运行结果，a无法打印，运行到这里会报错。</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/6/3/16b1de545d2b96da?w=492&amp;h=119&amp;f=png&amp;s=7186" alt=""></figure>
+<p>对运行结果存在疑惑？或许本文能够令你稍解疑惑。</p>
+<h2 id="iife的成立">IIFE的成立</h2>
+<p>IIFE可以看做是两部分构成，前半部分定义了一个函数表达式，后半部分的括号这是表示运行这个函数。拿一个具体的例子描述一下。</p>
+<pre><code class="language-javascript">(function a(){
+    console.log('run a');
+})();
+</code></pre>
+<p>在上面的代码中前半部分的圆括号定义了一个函数表达式，函数后面加上圆括号表示的语法是运行这个函数。当然IIFE的写法不止这一种，还有其他诸如，使用一个圆括号将函数表达式和后面的圆括号一起括起来等各种写法。</p>
+<p>由于标准中规定了function关键字开头是一个函数声明，所以要它变成函数表达式，我们需要加点东西，比如在function 开头加个 +，void，-等各种运算符，总之我们的目的是不让这一行以function开头，这样在语法解析式会认为function(){}()是一个表达式去运行它，而不是当做函数声明去解析它。看下面的例子：</p>
+<pre><code class="language-javascript">console.log(+function s(){return 1}())      // 1
+console.log(+function a(){})    // NaN
+</code></pre>
+<p>从上面的运行过可以看出，IIFE执行时是将function(){}()整体作为了一个表达式在运行的最终得出一个结果，当然在使用IIFE时我们并不关心返回结果。</p>
+<h2 id="不会污染全局作用域的原因">不会污染全局作用域的原因</h2>
+<p>IIFE不会污染全局变量的原因，是函数表达式的特性。</p>
+<h3 id="命名函数表达式">命名函数表达式</h3>
+<p>当我们使用函数表达式创建函数时，想在函数体内部使用当前函数，可以使用命名函数表达式。这个函数名称只会作为函数体内部变量。换言之，使用表达式创建的命名函数，并不能和声明函数一样在声明函数的作用域产生变量，而只会在这个命名函数内部产生这个变量，且该变量是只读的，不可被赋值。</p>
+<pre><code class="language-javascript">var a = function c() {
+    c = 'test';
+    console.log(c); // ƒ c() {
+                    // c = 'test';
+                    // console.log(c);
+                    // } 
+}
+a();
+console.log(c); // c is not defined
+</code></pre>
+<p>这里我们可以理解，IIFE不会污染全局变量是利用了函数表式的特性，由此而衍生的种种写法，只是为了在语法上是的解释器执行时能够识别这个表达式，然后执行它。当看到了这个本质的时候，对于它的种种写法我们就不需要去机械记忆了，我们自己也可以写出很多。</p>
+<h2 id="结论">结论</h2>
+<p>究其根本，IIFE是充分理解了语言特性并结合时代需求的产物。这里的特性更多的就是函数表达式的特性了，当然也有一部分语法特性的结合。需求当然就是所谓前端 “刀耕火种” 时代人们对组件化的探索。</p>
+<blockquote>
+<p>放在篇文章下不合适，但是就是突然想写的话： 记得有一种论调说，前端的发展不过是把其他语言多年前就已经实践过的思想搬过来而已，因此觉得前端没什么技术含量，甚至产生优越感。但是我想说的是，思想并不是某一语言，或者某一领域的所有物。不能因为年轻的事物，正在践行别人实践过的思想就认为它是在抄袭照搬的，毕竟同一个思想的实践在不同的需求下产生的火花是可以完全不同的。也借此表达下前端还是有很多独特而有意思的东西的，这一细分领域的出现不过是时代需求的产物，大家都是为需求服务的，所以没有必要产生所谓优越感或者自卑感，毕竟更好的实现需求才是根本。</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript基础系列之Object.defineProperty()]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()">
+        </link>
+        <updated>2019-05-31T14:46:12.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>Object.defineProperty()是 ES 标准中规定的一个可以定义对象属性特征的一个API，之所以会想起这个 API 是因为在上一篇探究instanceof的细节文章中，想要将右侧函数的Symbol.hasInstance属性重新定义，但是不管怎么定义都没有生效。具体代码如下：</p>
+<pre><code class="language-javascript">var A = function() {};
+var a = new A();
+
+console.log('Symbol.hasInstance修改之前', a instanceof A)
+
+A[Symbol.hasInstance] = function() {
+    return false;
+};
+
+console.log('Symbol.hasInstance修改之后', a instanceof A)
+</code></pre>
+<p><a href="https://jsbin.com/luqivup/1/edit?js,console">代码传送门</a></p>
+<p>不敢肯定打印结果的同学，如果是对设置 A 的Symbol.hasInstance可以改变 instanceof 关键字的检测结果有疑问可先参考我的另一篇文章<a href="https://juejin.im/post/5cdc1d38f265da03a54c419a">instanceof使用中可能漏掉的一点细节</a>，如果是只对第二个打印结果有疑问的可以继续往下读。</p>
+<h2 id="先解答上面的问题">先解答上面的问题</h2>
+<p>这里可以明确前言中代码打印的两次结果均是一致的，都是true。了解的同学都知道当我们定义了一个对象的Symbol.hasInstance属性后，我们是可以在函数中自定义instanceof返回结果的。在上面的代码中我设置的是直接返回false，也就是说只要函数我的属性设置生效了，第二次打印的结果应该是false才对。</p>
+<pre><code class="language-javascript">console.log(Object.getOwnPropertyDescriptor(Function.prototype, Symbol.hasInstance));   
+// {
+//   configurable: false,
+//   enumerable: false,
+//   value: function [Symbol.hasInstance]() { [native code] },
+//   writable: false
+// }
+
+var a = function() {}
+console.log(Object.getOwnPropertyDescriptor(a, Symbol.hasInstance)) // undefined
+
+a[Symbol.hasInstance] = function() {
+    return false;
+};
+console.log(Object.getOwnPropertyDescriptor(a, Symbol.hasInstance)) // undefined
+</code></pre>
+<p><a href="https://jsbin.com/lularom/1/edit?js,console">代码传送门</a></p>
+<p>开始时我也是有点费解，随后了解到是函数对象的原型对象上设置了Symbol.hasInstance属性的writable是false，上面代码的运行结果很好的验证了这一点。但是原型上设置的属性特征值，为什么继承了这个原型对象的对象也设置不了这个属性呢，该好好看看Object.defineProperty()的具体特性了。</p>
+<h2 id="可使用的属性特征值">可使用的属性特征值</h2>
+<p>下面列举了可能会被使用的属性特征：</p>
+<ol>
+<li>configurable：描述该属性的特征值是否可被更改，默认为false</li>
+<li>enumerable：描述该属性是否可以可枚举，即使用 for...in，for...of是否可遍历出该属性，默认为false</li>
+<li>value：描述获取该属性值时返回的值，默认为undefined</li>
+<li>writable：描述该属性的值是否可通过=重新赋值，默认为false</li>
+<li>get：描述获取该属性值时调用的函数，并返回函数的结果，默认为undefined</li>
+<li>set：描述该属性被赋值时调用的函数，默认为undefined</li>
+</ol>
+<p>对象的属性可分为两类，一类是直接设置值的属性，被称为数据描述符，我们大多数时候使用的都是数据描述符；另一类是存取描述符，是由setter-getter函数对描述的属性。实际上这两类属性的产生，是因为其使用的属性特征值不同。</p>
+<h3 id="通用的特征值">通用的特征值</h3>
+<p>上述1，2特征值是两类对象属性都可以使用的特征值</p>
+<h4 id="configurable">configurable</h4>
+<p>该特征值的作用主要是描述该属性被设置的特征值否可以被修改，默认情况下是false，也就是说，不设置这个值为true，这个属性的特征值就无法再被定义了，再定义的话会报错，具体可参考如下代码及运行结果。</p>
+<pre><code class="language-javascript">var a = {};
+Object.defineProperty(a, 'confName', {
+    configurable: true,
+    value: 3
+});
+console.log('a.confName的特征描述值', Object.getOwnPropertyDescriptor(a, 'confName'));
+Object.defineProperty(a, 'confName', {
+    value: 5
+})
+console.log('a.confName的值', a.confName);  // 5
+
+Object.defineProperty(a, 'name', {
+    value: 3
+});
+console.log('a.name的特征描述值', Object.getOwnPropertyDescriptor(a, 'name'));
+
+Object.defineProperty(a, 'name', {
+    value: 5
+}); // 不出意外这句会报错
+
+</code></pre>
+<p><a href="https://jsbin.com/xeleqef/1/edit?js,console">代码传送门</a></p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/28/16afebfc6ecf566a?w=637&amp;h=111&amp;f=png&amp;s=16686" alt=""></figure>
+<blockquote>
+<p>Tips：这段代码中有一个关于 writable 的小细节，将在数据描述符小节中解释。</p>
+</blockquote>
+<h4 id="enumerable">enumerable</h4>
+<p>该特征值没有太多说的，就是定义该属性是否可枚举。粗暴点来说，就是当我们使用for...of，for...in等遍历对象属性的手段时是否可以获取到该属性。如果其值为true时就是可枚举的，为false不可枚举。</p>
+<h3 id="数据描述符">数据描述符</h3>
+<p>如果对象属性的特征值使用了 value 或者 writable，那么这个对象属性就属于数据描述符。</p>
+<h4 id="value">value</h4>
+<p>value 描述了该属性是什么值，其值可以是任何 JS 中规定的数据类型。</p>
+<h4 id="writable">writable</h4>
+<p>这个是一个比较有意思的特征值，其可以描述数据描述符的 value 是否可以使用 . 赋值修改，为 true 表示可以修改，false表示不可以修改，数据描述符中该值默认是 false。</p>
+<p>这里有意思的点在于，当你设置writable为false是并不能完全保证该属性的值不会被修改，而是必须配合 configurable 为false才可以完全保证属性不会被修改。上面强调了 <strong>value 是否可以使用 . 赋值修改</strong>，除了这种方式我们还可以使用configurable代码示例中的方式来修改属性的值。具体可参考以下代码：</p>
+<pre><code class="language-javascript">var b = {};
+Object.defineProperty(b, 'name', {
+    configurable: true,
+    value: 3
+});
+b.name = 9;
+console.log('使用 = 重新赋值b.name', b.name);   // 3 对象属性不可 . 赋值修改时，不会报错，只是值不会发生改变 
+
+Object.defineProperty(b, 'name', {
+    value: 9
+});
+console.log('使用definePeoperty重新赋值b.name', b.name);    // 9 赋值成功
+</code></pre>
+<p><a href="https://jsbin.com/xasabad/edit?js,console">代码传送门</a></p>
+<h3 id="存取描述符">存取描述符</h3>
+<p>如果对象属性的特征值使用了 get 或者 set，那么这个对象属性就属于存取描述符。</p>
+<h4 id="get和set中的this">get和set中的this</h4>
+<p>值得注意的是，当我们在get和set中使用this时，this绑定的是当前使用该属性的对象。不一定是设置该值的对象，也就是一个对象a的某个属性name设置了get和set，这个对象是另一个对象b的原型，那么在b上设置name属性时，调用的set函数中的this绑定的是吧，而不是设置了该特征值的a。下面上代码：</p>
+<pre><code class="language-javascript">var c = {};
+Object.defineProperty(c, 'name', {
+	get: function() {
+		return this.test
+	},
+	set: function(value) {
+		this.test = value;
+	}
+});
+var b = {};
+Object.setPrototypeOf(b, c);
+b.name = 'b';   // 此处会调用name属性的set函数
+                // 会将'b'赋值给this.test，而this绑定的是b
+                // 所以相当于在b上设置了test属性并赋值为'b'
+
+console.log('b.name', b.name);  // b 出现这个结果是因为调用了name属性设置的get函数
+                                //get函数返回结果是this.test而this绑定的是b
+console.log('b.test', b.test);  // b 这个test属性是设置在b对象上的
+console.log('c.name', c.name);  // undefined
+console.log('c.test', c.test);  // undefined
+
+var s = 's';
+var d = {};
+Object.defineProperty(d, 'name', {
+	get: function() {
+		return s
+	},
+	set: function(value) {
+		s = value
+	}
+});
+var e = {};
+Object.setPrototypeOf(e, d);
+e.name = 'e';   // 此处会调用set函数，set函数将s赋值为'e'
+
+console.log('s的值', s);    // 'e' 变量s的值因为set函数的调用，而被设置为'e'
+console.log('e.name', e.name);  // 'e' 此处的name属性不是在对象e上的
+                                //而是通过委托查询到的其原型对象d上的那么属性调用get函数返回的值
+console.log('d.name', d.name);  // 'e' 此处name属性是在对象d上真实存在的
+</code></pre>
+<p><a href="https://jsbin.com/ruquzub/1/edit?js,console">代码传送门</a></p>
+<p>通过上面的栗子可以看出，当对象的原型对象设置了某个属性的get或set函数时，对象再使用该属性时都会调用set或get函数，这是的调用效果类似set.call(b, value)，指定了this是当前对象，但是调用的函数还是在对象原型上的那个属性的set函数。</p>
+<h3 id="不能同时使用">不能同时使用</h3>
+<p>如果一个描述符不具有value,writable,get 和 set 任意一个关键字，那么它将被认为是一个数据描述符。如果一个描述符同时有(value或writable)和(get或set)关键字，将会产生一个异常。</p>
+<h2 id="特征值的继承">特征值的继承</h2>
+<p>对象的属性设置的特征值是可能会被以其为原型的对象继承的，不管是在赋值还是在获取值时，都有可能会产生影响。</p>
+<h3 id="value和writable的继承">value和writable的继承</h3>
+<p>这里的继承指的是对象设置某个属性时，该属性的设置会受到其原型对象上的该属性设置的特征值的影响。</p>
+<p>writable设置为false时，以设置该属性的对象为原型的对象，在设置该属性时也会无法设置该值，这不会产生报错，只是属性设置一直无效。</p>
+<pre><code class="language-javascript">var f = {};
+Object.defineProperty(f, 'name', {
+	value: 'f'
+});
+var g = {};
+Object.setPrototypeOf(g, f);
+
+console.log('g.name', g.name);  // 'f'
+g.name = 'g';
+console.log('g.name', g.name); // 'g'
+</code></pre>
+<p><a href="https://jsbin.com/tefapus/edit?js,console">代码传送门</a></p>
+<p>只有writable设置为false时，writable会表现出继承性，而为true时则对以其为原型的对象没有影响。平时我们直接设置的对象属性的writable就是true，回想一下平时的使用确实没有设置不了对象属性的情况。</p>
+<pre><code class="language-javascript">var a = {
+	name: 'a'
+}
+a.id = 'a';
+console.log(Object.getOwnPropertyDescriptor(a, 'name'))
+//configurable: true
+//enumerable: true
+//value: &quot;a&quot;
+//writable: true
+console.log(Object.getOwnPropertyDescriptor(a, 'id'))
+//configurable: true
+//enumerable: true
+//value: &quot;a&quot;
+//writable: true
+var b = {};
+Object.setPrototypeOf(b, a);
+console.log(b.name);    // 'a'
+b.name = 'b';
+console.log(b.name);    // 'b'
+console.log(a.name);    // 'a'
+
+</code></pre>
+<p>value的继承性主要表现在原型链的继承上（就是原型继承，可以参考我的另一篇<a href="https://juejin.im/post/5c7804806fb9a049ad77be6a">理解原型其实是理解原型链</a>）。</p>
+<h3 id="set和get的继承">set和get的继承</h3>
+<p>属性的set和get特征值同样是具有继承性的，且与writable的继承性有条件不同，set和get会一直被继承，只要对象是以设置了该特征值的属性的对象为原型，对象设置或者获取该属性的值时都会调用原型上的get和set函数。</p>
+<pre><code class="language-javascript">var hValue;
+var h = {};
+Object.defineProperty(h, 'name', {
+	set: function(value) {
+	    console.log('h set调用');
+	    hValue = value;
+	},
+	get: function() {
+	    console.log('h get调用')
+	    return hValue;
+	}
+});
+
+var i = {};
+Object.setPrototypeOf(i, h);
+i.name = 'i';   // 会调用h上的set打印'h set调用'
+i.test = 'testi';   
+console.log('hValue', hValue);  // 'i'
+console.log('i.name', i.name);  // 'i' 会调用h上的get打印'h get调用'
+console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
+
+var jValue;
+var j = {};
+Object.defineProperty(j, 'name', {
+	get: function() {
+	    console.log('j get调用')
+	    return jValue;
+	}
+});
+
+var k = {};
+Object.setPrototypeOf(k, j);
+k.name = 'k';   // 会调用h上的set打印'h set调用'
+k.test = 'testk';   
+console.log('jValue', jValue);  // 'k'
+console.log('k.name', k.name);  // 'k' 会调用h上的get打印'j get调用'
+console.log('j.name', j.name);  // 'k' 会调用h上的get打印'j get调用'
+
+</code></pre>
+<p><a href="https://jsbin.com/kapudaq/1/edit?js,console">代码传送门</a></p>
+<p>h是i的原型对象，h的name属性设置了get和set函数，这种设置会让i对象上无法再使用.为name属性赋值，获取name属性值时也只会通过原型委托查找到h上的name。如果在i上使用Object.defineProperty()来定义一个那么属性，那么这个属性是可以被定义在对象i上的。</p>
+<pre><code class="language-javascript">var hValue;
+var h = {};
+Object.defineProperty(h, 'name', {
+	set: function(value) {
+	    console.log('h set调用');
+	    hValue = value;
+	},
+	get: function() {
+	    console.log('h get调用')
+	    return hValue;
+	}
+});
+
+var i = {};
+Object.setPrototypeOf(i, h);
+var iValue;
+Object.defineProperty(i, 'name', {
+	set: function(value) {
+	    console.log('i set调用');
+	    iValue = value;
+	},
+	get: function() {
+	    console.log('i get调用')
+	    return iValue;
+	}
+});   
+i.name = 'i';   // 会调用i上的set函数，打印'i set调用'
+console.log('iValue', iValue);  // 'i'
+console.log('i.name', i.name);  // 'i' 会调用i上的get打印'i get调用'
+console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
+</code></pre>
+<p><a href="https://jsbin.com/gabaset/edit?js,console">代码传送门</a></p>
+<p>通过Object.defineProperty()设置的对象属性依然是遵从原型继承规则，查找属性值会先从对象自身查找属性，如果查找不到通过原型链向上查找，直到查找到原型链顶端，而设置对象属性时只能设置到对象本身。只不过这个原型继承是建立在子对象的属性设置同样是通过Object.defineProperty()定义的属性。</p>
+<h2 id="结论">结论</h2>
+<p>Object.defineProperty()定义属性某种程度上是给程序提供了一个可以去定义属性访问器行为的接口。</p>
+<p>value可以定义使用属性访问器获取对象属性时获取到的值，writable 可以定义使用属性访问器设置属性的值是否被允许；get 可以定义使用属性访问器获取对象属性时再做一些额外操作，set 可以定义使用属性访问器给对象属性赋值时进行一些额外的操作，例如 VUE2 中的双向绑定机制的运用。</p>
+<p>其实属性特征值的继承性在获取属性值时的表现与原型继承基本一致，与原型原型继承不同的是在使用 属性访问器给对象属性赋值时，原型对象上某属性的writable为false会被其子对象继承导致子对象无法使用属性访问器对该属性重新赋值，子对象上也无法设置属性；原型上的某属性的set会被其子对象继承，子对象使用属性访问器设置对象的该属性时会调用原型上的set函数来完成赋值操作。最后，当对象原型和其子对象的属性设置都是用Object.defineProperty()来定义时，属性的特征值是不表现继承性的。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript基础系列之instanceof细节]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节">
+        </link>
+        <updated>2019-05-19T14:46:12.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>在面向对象语言中，一般都有关键字 instanceof 来检测对象类型，更准确点来说是检测对象是哪个类型的实例。那么在 JS 中这个关键字又有什么不同之处呢？此文仅是一篇对 ES 标准中 instanceof 关键字的解读，并记录了在此过程中的对 JS 中对象系统的一点小感悟。</p>
+<h2 id="标准规定该关键字需要做什么">标准规定该关键字需要做什么</h2>
+<p>先举例 a instanceof b, 下文中的步骤解释中关键字左侧的值用a表示， 右侧的值用b表示。</p>
+<p>在标准中 instanceof 的行为被抽象到 InstanceofOperator 操作中，下面列出比较关键的两个抽象操作，并根据自己的理解对整理了下步骤：</p>
+<ul>
+<li>InstanceofOperator ( a, b)；</li>
+<li>OrdinaryHasInstance ( b, a )；</li>
+</ul>
+<h3 id="instanceofoperator-a-b">InstanceofOperator ( a, b)</h3>
+<ol>
+<li>检测b是否是对象，否TypeError</li>
+<li>获取b是否定义了Symbol.hasInstance</li>
+<li>是则b[Symbol.hasInstance](a)，返回true或false</li>
+<li>否则判断b是否是函数，否则TypeError</li>
+<li>是则返回OrdinaryHasInstance(b, a)的运行结果</li>
+</ol>
+<h3 id="ordinaryhasinstance-b-a">OrdinaryHasInstance ( b, a )</h3>
+<ol start="6">
+<li>判断b是否是函数，否则返回false（这一步在这一场景中应该不会被调用）</li>
+<li>是则判断b是否是被bind包装过的函数，是则获取到bind包装的函数bc，并调用InstanceofOperator( a, bc)</li>
+<li>是则检测a是否是对象，否则返回false</li>
+<li>是则获取b的prototype属性bp</li>
+<li>如果bp不是对象则返回TypeError</li>
+<li>获取a的原型并赋值给a</li>
+<li>检测a是否为null，是则返回false</li>
+<li>否则判断a和bp是否相等，是则返回true</li>
+<li>否则重复步骤11~14直至返回true或false</li>
+</ol>
+<h2 id="几处细节的推敲">几处细节的推敲</h2>
+<p>在查看标准解释是，有几处理解的不是很明白，故使用几个demo对自己的理解做了验证</p>
+<h3 id="b应该是什么值">b应该是什么值</h3>
+<p>先看b不是对象是什么情况<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt=""></p>
+<p>从上面的结果可以看到报错了，而且错误提示很明显的提示右侧的值不是对象，这是第1步检测报的错，那么如果是对象，而不是函数对象又会是什么情况呢？</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt=""></figure>
+<p>嗯，没错，对象也报错了，这次的错误是右侧的值不可调用，即不是函数，这应是第4步检测报的错了。根据上面的步骤试试给对象设置Symbol.hasInstance属性</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt=""><br>
+这一次没有报错，检测正常进行了，且返回了在函数中定义的结果，根据上面的步骤和代码验证，可以得出右侧的值可以是设置了Symbol.hasInstance属性的对象。且检测的结果会被右侧值定义的Symbol.hasInsyance函数拦截成函数返回的结果。</p>
+<p>右侧是函数的情况就是比觉正常的返回了，需要明确的一点是函数是不能直接设置Symbol.hasInstance属性的，具体原因，感兴趣的可以继续查阅资料。到这里可以得出结论，b必须是设置了Symbol的对象或者函数，否则会报错。</p>
+<h3 id="被-dind-包装过的函数依然会返回原函数原型检测结果">被 dind 包装过的函数依然会返回原函数原型检测结果</h3>
+<p>这一步存疑的原因是，没有直接理解标准中的描述，只是有所猜测，不能确定，故验证之。</p>
+<pre><code class="language-javascript">var a = function() {
+   this.name = 'a';
+}; 
+var b = {testName: 'b'};
+a.prototype = b;
+
+var c = new a();
+console.log('c instanceof a', c instanceof a);   // true
+
+var h = {name: 'h'};
+var s = a.bind(h);
+console.log('c instanceof s', c instanceof s);   // true
+</code></pre>
+<p><a href="https://user-gold-cdn.xitu.io/2019/5/19/16ad065d3992af89">代码传送门</a></p>
+<p>如上代码示例，从其运行结果可知，a.prototype 是等于 c 的原型的，s 是 a 被 bind 对象 h 后返回的函数，从验证结果来看，函数经过 bind 的一层包装，依然不会影响其原型检测的绑定。</p>
+<h2 id="一点思考">一点思考</h2>
+<p>在推敲上面细节时突然联想到这种检测实际是很合理的，类比 Java 中的检测类，这里对象的原型不就可以类比成 Java 里面的类么。 某个对象的原型是什么决定它具备了原型对象的特性的，而类不也是这样么，该对象属于哪个类，决定了该对象具备了哪些特性。不同的是，在JS中的检测是往继承链上多退了一步的，Java 中是直接检测对象是否是该类的实例，而JS中是检测的是对象的原型是否等于函数的prototype属性，这应该就是继承原理不同产生的区别吧。</p>
+<p>之前从未认真的思考过，JS 中的整个对象系统是什么样的，虽然现在也还是没有理解太多，但是至少现在在我的认知里 JS 的<br>
+对象系统是简单而完善的，并没有因为简单而缺少了面向对象基本特性。虽然它灵活的允许你随便更改一个对象的原型，也就是类，但是这依然不妨碍它成为一门可以面像对象编程的语言。</p>
+<h2 id="结论">结论</h2>
+<p>instanceof 关键字检测的本质是检测左侧对象的原型链上是否存在和右侧函数的prototype属性相等的对象，如果存在则返回true，如果不存在则返回false。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript基础系列之原型链]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_prototype</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_prototype">
+        </link>
+        <updated>2019-05-08T14:46:12.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>原型和原型链，说是两个词，其实理解一个就可以了。这两个概念是同时存在的，不可能抛开一个去谈论另外一个，或者说这两个概念结合在一起才会发挥作用，甚至原型的存在是因为有原型链的存在，不在原型链上的原型只能称之为对象。</p>
+<h2 id="原型链">原型链</h2>
+<p>先来说说原型链是个什么东东，说起链我们现在脑海中描绘一下自己对链这个字的第一反应是什么，是社会我大哥的大金链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="">是二哈的大狗链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt=""><br>
+还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt=""></p>
+<p>皮一下，下面我们正经说原型链，原型链从本质上来讲应该是个链表结构，也就是和上面的单链表有点像，我们把上图中的next换成__proto__属性，data换成键值对集合，这样经常在控制台输出对象的同学会不会有点熟悉的感觉？</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt=""></figure>
+<h3 id="举个栗子">举个栗子</h3>
+<p>下面举个庸俗的例子，有一个对象人，有move和sleep属性，人中又有男人具有sex属性，男人中又有一类人程序员具有code和hair（其值为less）属性，现在我们想用一个对象来表达程序员，那么这个对象应该同时具备人，男人，程序员的属性，我们用原型链来表达他们，就像这样</p>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt=""></figure>
+<p>原型链具备的特征是能够从下往上查找属性，利于当我在要programmer对象中读取sex属性时，浏览器引擎会先在programmer对象中查找该属性，如果未查找到，那么通过其__proto__找到man对象，在man对象中去查找，在man对象中查找到了sex属性，并获取其值‘man’将其返回，就完成了一次属性查找。同理如果要通过programmer获取move，也是这样层层查找自身属性并通过__proto__往上查找。</p>
+<p>程序员的睡觉时间与一般人不同，因此需要定义自己的sleep方法，直接在programmer对象上设置sleep属性，那么programmer对象就具有了自己的sleep属性，当通过程序员获取sleep属性时获取到的就是自己定义的sleep属性，也就是说同样都是person，此刻的programmer的sleep已不是peroson的sleep。</p>
+<h3 id="原型链的特征">原型链的特征</h3>
+<p>通过上上面的例子，我们不难得出原型链具有的两个基本特征：</p>
+<ol>
+<li>查找属性时可顺链向上查找</li>
+<li>设置属性时只能设置当前对象的属性，而不会影响其上层链上的对象属性</li>
+</ol>
+<p>第一点特征常常被人们称为继承，但是应该不能算是真正的继承，只能说在表现上与继承无异。真正意义上的继承是你从某处学会了某项能力，就算只有你一个人的时候你也是具备这项能力的，但是我们的原型链更应该是一个委托链，你可以通过这个委托链获取这个链上自你之后所有对象的能力，如果这个链发生变化你可能会失去某项能力。继承是对象本身具有这个能力或者特性，而原型委托是你及你身后的委托链具备这个能力。当然这对于对象的使用者我们来说是无所谓的，我们不必过分纠结到底是继承还是委托，但是了解事情的本质也是一件不错的事。</p>
+<p>其实原型链具备这两点特征实际上是很自然而然的，这样的表现形式并没有太多刻意的违背正常逻辑的人为规定，我们只需稍微思考其在实际中的作用就能理解。</p>
+<h2 id="__proto__和prototype的关系">__proto__和prototype的关系</h2>
+<p>原型的英文是什么来着，嗯，prototype，只要说到原型就会被人们提起的一个词。那么它到底和原型有没有关系呢？这里我要说这个词虽然是原型的意思，其实它和原型并没有什么关系，骚年们以后不要直接在对象上去a.prototype了，这样你大多数情况下得到的只会是undefined(在函数对象上可以获取到值)。能在对象上直接获取其原型的是__proto__，你a.__proto__多数一般都能取到值，这个属性记录了该对象的原型对象地址。</p>
+<h3 id="prototype">prototype</h3>
+<p>这个词其实和原型链是有关系的，和原型真的一点关系没有，其作用是用来指定你使用new关键字调用函数的时候生成实例对象的原型（这个原型后面可能还藏着一条原型链）的。下面上代码</p>
+<pre><code class="language-javascript">var person = {
+  move: function() {
+    console.log('moving')
+  },
+  sleep: function() {
+    console.log('sleeping')
+  }
+};
+
+function Man() {
+  this.sex = 'man'
+}
+
+// 为new Man()得到的对象指定原型对象person
+Man.prototype = person;
+
+function Programmer() {
+  this.hair = 'less';
+  this.code = function() {
+    console.log('coding')
+  }
+}
+
+// 为new Programmer()得到的对象指定原型对象new Man()
+Programmer.prototype = new Man();
+
+var programmer = new Programmer();
+console.log(programmer);
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt=""></figure>
+<p>从上面的代码的运行结果中我们不难看出，prototype的作用只是在特定场景下得到的对象的原型（还有其他多种指定对象原型的方式，下面另开小节说明），且这里指定的不仅仅是原型，当指定man为programmer的原型时，同时也意味着man的原型person及person的原型Object这一整个链都被指定给了programmer。</p>
+<h3 id="__proto__">__proto__</h3>
+<p>上面的运行结果中我们可以看到，在每个对象上都有一个属性__proto__，这个属性不是我们指定的，而且这只是在大多数浏览器中这个属性名是__proto__，这个属性名的作用就是记录对象的原型指向。虽然不一定每个浏览器中都是这个属性名，但是相同的是他们必然都有一个属性用来记录对象的原型。当我们要获取一个对象的原型时应该使用ES的标准API: Object.getPrototypeOf()或者Reflect.getPrototypeOf()（ES6），来获取。</p>
+<h3 id="原型链关系图">原型链关系图</h3>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt=""></figure>
+<p>话说本来只是随便画画的，结果就成了你上面看到那个样子，让我们大家一起来找茬，发现有哪个等式不成立的欢迎在评论区打脸。另表达下个人的对JS中的对象起点观念，我认为是Object.prototype指向的这个对象，不认为是null，不接受反驳（傲娇脸）。关于这一点，这里解释一下，在JS中所有对象的原型链追到最后应该都是Object.prototype指向的对象（通过使用下面的指定原型对象为null的方式的对象除外），上图中所表现的想表明的是具备实际使用意义的原型链起点。</p>
+<p>Object.prototype.__proto__的值是null也就是表明Object.prototype对象是存在这个属性的，因为它不是undefined，但是这个值应该被理解为一个原型链的结束符号更为准一些，使用这个符号是为了能够更好的实现JS引擎，而不是语言具备的标准特性。</p>
+<h2 id="指定对象原型的几种方式">指定对象原型的几种方式</h2>
+<p>总结了下指定对象的原型的几种方法，大体可分为非标准操作，标准API操作，特定场景操作。为了方便举例，我们设定一个场景，对象a有name属性，其值为a，对象b有color属性，其值为red，现在要求将a指定为b的原型。</p>
+<h3 id="非标准操作">非标准操作</h3>
+<p>这个是最简单粗暴的方式，直接设置对象的__proto__属性，像下面这样</p>
+<pre><code class="language-javascript">var a = {name: 'a'};
+var b = {id: 'b'};
+console.log('a的原型是Object.prototype', Object.getPrototypeOf(a) === Object.prototype);    //true
+a.__proto__ = b
+console.log('a的原型是b', Object.getPrototypeOf(a) === b);  //true
+</code></pre>
+<p><a href="https://jsbin.com/doyuroz/1/edit?js,console">代码传送门</a></p>
+<p>这种方式虽然很简单，但是一般不建议在生产代码中使用，这种写法存在兼容性上的问题，这个没有在标准中规定的属性只是靠各浏览器厂商之间的默契维持，兼容性可想而知。其次这种方式在代码的可维护性上不是很好，毕竟不是谁都知道这个属性__proto__(虽然觉得搞前端的同学应该都知道)。</p>
+<h3 id="标准api操作">标准API操作</h3>
+<p>下面来介绍几个指定对象的API（水字数）。</p>
+<h4 id="objectsetprototypeof">Object.setPrototypeOf</h4>
+<p>这个是Object对象的一个静态方法，使用方式如下</p>
+<pre><code class="language-javascript">var a = {name: 'a'};
+var b = {id: 'b'};
+console.log('a的原型是Object.prototype', Object.getPrototypeOf(a) === Object.prototype);    //true
+Object.setPrototypeOf(b);
+console.log('a的原型是b', Object.getPrototypeOf(a) === b);  //true
+</code></pre>
+<p>这个方法使用简单，兼容性好，指定对象的原型首推使用这个方法。</p>
+<h4 id="reflectsetprototypeof">Reflect.setPrototypeOf</h4>
+<p>此API的方式同上，没什么好说的，只是这个ES6标准中提供的方法。按照阮老师的说法，Reflect对象应该会将Object上定义的一些对象操作方法都接收过来。</p>
+<h4 id="objectcreate">Object.create</h4>
+<p>Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。 下面上代码</p>
+<pre><code class="language-javascript">var b = {id: 'b'};
+var c = Object.create(b, {
+    name: {
+    	value: 'a'     
+    }
+});
+console.log('a的原型是b', Object.getPrototypeOf(c) === b);  //true
+</code></pre>
+<p>使用Object.create()方法会得到一个指定属性的新对象，这个方法的第一个参数可以指定新得到对象的原型，第二个参数可以指定对象属性值等。</p>
+<blockquote>
+<p>如果你想得到一个纯净的的对象（没有原型），可以在上面三个API使用时指定原型对象那个参数传入null</p>
+</blockquote>
+<h3 id="特定场景操作">特定场景操作</h3>
+<p>将使用new关键词调用函数创建实例对象，通过指定函数的prototype属性来指定对象的方式放在特定场景操作，是因为这种方式不具备上面几种方式的灵活性，不能随时随地的修改对象的原型，使用起来也比较麻烦，怎么用大家应该都懂，这里就不多说了。。</p>
+<h2 id="结论">结论</h2>
+<p>通常我们在谈论原型的时候，应该都是在谈论这种设计模式，这应该是一种思想，一种解决问题的方式，我们对它的理解不应该仅仅停留在对机制的理解上。这种模式的优点在于你只需要在原型上的添加某个属性，指向该原型的所有对象都会具有这个属性，而不用一个一个的去给这些对象添加这个属性。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ECMAScript基础之通过let说闭包]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/closureBylet</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/closureBylet">
+        </link>
+        <updated>2019-04-20T15:03:38.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>标题虽说是讲模块化的，其实这是一篇讲闭包的文章（没错，这就是不要脸的标题党）。</p>
+<p>闭包这个概念并不是 JavaScript 的专利，本篇中描述的闭包均是 JavaScript 中的闭包，其相关的描述也均是围绕 JavaScript 来的。在 JavaScript 中闭包是很常见的，有时甚至不经意间就写出来了，可能自己还没有意识到。比如下面</p>
+<pre><code class="language-javascript">
+{
+    let a = 'a';
+    function getBlockA() {
+        return a;
+    }
+    let b = 'b';
+} 
+</code></pre>
+<p>可能有人会质疑这不是闭包，因为这根本不像，别着急反对，下面我们一起来看下这样的写法是否产生了闭包。</p>
+<h2 id="闭包的定义">闭包的定义</h2>
+<p>对于闭包的描述通常有两种：</p>
+<ul>
+<li>闭包是在其词法上下文中引用了非其局部变量的变量的函数</li>
+<li>闭包是由函数和与其相关的引用环境组合而成</li>
+</ul>
+<p>上面两种描述一定程度上是对立的，一个描述的是函数，一个描述的是函数和其引用环境组成的整体。闭包只是使用和外在表现上很像函数，但是实际上并不是函数，所以第二种说法应该更为准确一些。当然在 JS 中第一种描述也是没有什么问题的，因为 JS 中能够带着被其访问的变量到处跑的只有函数了。</p>
+<h2 id="闭包出现的条件">闭包出现的条件</h2>
+<p>其实闭包出现的条件并不复杂，在局部作用域访问了其他局部作用域中的变量就产生了闭包。也就是只有一个条件：</p>
+<ol>
+<li>在局部作用域中访问了其他局部变量</li>
+</ol>
+<p>是不是比想象中的更容易得到一个闭包呢，其实在我写之前也对闭包的产生有些误解，开始理解的被定义的局部作用域必须要被使用了才会产生闭包，我们可以借助chrome的调试工具中的作用域显示来理解闭包的产生。<br>
+考虑如下代码：</p>
+<pre><code class="language-javascript">function outer() {
+    var outerVar = 'outer';
+    function inner() {
+        return outerVar;
+    }
+}
+outer();
+</code></pre>
+<p>上面的代码是否产生了闭包呢？我们来看下调试工具中是怎么体现的</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt=""></figure>
+<p>如上图可见在outer函数的结尾大括号处打上断点，可以查看outer函数的作用域（结尾处打断点可以更准确的获得所用变量的值），上图中标识outer处的scope表示的就是断点处所在作用域的变量，Locale就是outer函数作用域中定义的变量集合，Global表示的可访问的全局变量集合。</p>
+<p>outer的Scope中的locale里面可以看到变量outerVar，inner，其中outerVar的值是字符串outer，inner的值是一个函数。</p>
+<p>展开inner函数可以看到该函数的[[Scopes]]，这里没由Local类型的变量，但是有一个Closure，这里没有Locale的原因是inner函数并没有定义变量，而是引用了其父作用域outer函数作用域中的outerVal变量，我们可以在Closure中看到outerVal，这个Closure就是表示的该函数引用的其他局部作用域的变量集合，当一个函数的[[Scopes]]中出现Closure就表示这个函数及其所引用的其他局部作用域变量共同形成了一个闭包。</p>
+<h2 id="闭包中被忽略的细节">闭包中被忽略的细节</h2>
+<p>上面基本搞清了如何产生一个闭包，以及怎么去观察一个闭包，下面说说闭包中通常被忽略（大佬们觉得没什么好说的，菜鸟不知道的一些细节），下面先上一发强者鉴定术（理解的大佬请忽略本节）：</p>
+<pre><code class="language-javascript">
+function outer() {
+    var outerVal = new Array(1000000) ;
+    
+    function consoleOuterVal() {
+        console.log(outerVal);
+    }
+    
+    consoleOuterVal();
+    
+    function inner() {
+        console.log('ok');
+    }
+    
+    return inner;
+};
+
+for(var i=0; i&lt;10000; i++) {
+    outer();
+}
+
+</code></pre>
+<p>这段代码中是存在问题的，下面说下具体什么问题。</p>
+<h3 id="共享闭包">共享闭包</h3>
+<p>上面的代码中存在内存泄漏问题，下面通过调试工具看下这段代码的情况：</p>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt=""></figure>
+<p>通过上图可见consoleOuterVal和inner函数的[[Scopes]]中均出现了Closure，且其保存的变量均为outerVal，inner中没用引用outerVal变量，怎么会该变量会出现在其Closure中呢？这实际上是在得到函数Closure中的变量时，JS引擎会把作用域下的所有闭包变量放在一起，在该作用域下定义的函数都会得到一个相同的Closure。这样的话上面的inner也会拥有和consoleOuterVal函数一样变量引用，且该变量一直无法释放，随着循环的增加，内存自然就不够用了。</p>
+<p>关于共享闭包的 更多细节探讨可访问<a href="https://juejin.im/post/5c723d90f265da2dc0065bdb">前端小秘密系列之闭包</a>（非本人，这里不要脸的引用下）。</p>
+<h3 id="不建议使用eval的原因">不建议使用eval的原因</h3>
+<p>在很多编码规范中都会明确提到不要使用eval函数，或者使用时需要小心谨慎。<br>
+考虑如下代码中inner的Closure：</p>
+<pre><code>function outer() {
+    var outerVal = new Array(1000000) ;
+    var str = &quot;test&quot;;
+    
+    eval('console.log(&quot;test&quot;)')
+    
+    function inner() {
+        console.log('ok');
+    }
+    
+    return inner;
+};
+
+outer();
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt=""></figure>
+<p>具体的原因是，js 引擎在解析包含有eval的函数时会保留该函数中的所有可以引用的变量保留在Clousre，因为根本不知道eval会插入什么样的语句，在该语句中会使用什么变量也是不确定的，所以函数中的所有可以引用的变量都会保留，那么在该函数中定义的其他函数也会保留该函数的所有可引用变量，容易造成内存浪费，同时导致内存泄漏的可能性又增大很多。</p>
+<h2 id="let块级作用域产生的闭包">let块级作用域产生的闭包</h2>
+<p>上面说了那么多，总结下闭包的出现条件，及其特点：</p>
+<p>出现条件：在局部作用域中访问了其他局部变量</p>
+<p>特点：</p>
+<ol>
+<li>函数引用的变量会被保留</li>
+<li>同一局部作用域下定义的函数产生的Closure共享</li>
+</ol>
+<p>下面是文章开头代码的Scope情况：</p>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt=""></figure>
+<p>上图中let定义的变量a出现在了getBlockA函数的作用域中，只是这个作用域既不是Local，也不是Closure，而是Block，Block表示的是块级作用域，用let和const定义的变量才会存在块级作用域。这个块级作用域和局部作用域（函数作用域）是没有太大区别的，不同之处在于，块级作用域仅仅约束let和const定义的变量的作用范围，而局部作用域没有这个限制，可以约束所有该作用域定义的变量。</p>
+<p>在这个示例中变量a作为块级作用域的变量，在getBlockA函数的作用域（局部作用域）中被引用了，是符合闭包出现的条件的。</p>
+<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt=""></figure>
+<p>如上图所示，变量变量a被保留了，因为在全局函数getBlockA中被引用了，getBlockA是全局变量，全局变量不会被回收，这也就导致了被其引用的变量a会一直被保存在内存中不会被回收。</p>
+<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt=""></figure>
+<p>如上图所示，getBlockA和getBlockB中的Block保留的变量是相同的，且这两个函数分别只引用了其中一个变量，这说明在块级作用域中定义的函数也会存在闭包的共享。</p>
+<p>所以有let或const定义的变量而产生的块级作用域中定义的函数完全可以认为是闭包。</p>
+<h2 id="js中函数作用域和块级作用域的区别">js中函数作用域和块级作用域的区别</h2>
+<p>函数作用域是局部作用的一种，块级作用域也是局部作用域的一种，这两者的共同点在于，都是通过一对大括号（{}）来定义其作用边界的，其不同点主要在于：</p>
+<ol>
+<li>函数作用域的大括号必须是函数定义的大括号而块级作用域的大括号没有任何限制，只要是一对大括号就可以</li>
+<li>函数作用域中这对大括号的边界作用会对其中定义的所有变量生效，而块级作用域中这对大括号的边界限制仅仅对于let和const定义的变量才会有作用，对于使用var定义的变量没有作用。</li>
+</ol>
+<p>闭包常常被人们用来做模块化，其实有了let和const之后完全可以用一对大括号来模块化，只需将不会对外暴露的变量使用let或const定义，对外暴露的接口使用var来定义，这样就完全可以达到闭包模块化的效果。只是let和const特性在ES标准中出现的同时，也出现了模块化标准，所以用不上就是了。</p>
+<h2 id="结论">结论</h2>
+<p>闭包是一个比较广泛的概念，狭义的理解其为函数中定义的函数是存在局限性的，至少在js中这个定义已经不再适用于闭包，let和const定义的变量产生的块级作用域已经打破了在函数中定义这一点，剩下的一点被定义的函数，如果存在别的形式可以保留对某一作用域的访问，且这种形式可以被当做变量随意传递的话，那么这样狭义的定义会被彻底打破。</p>
+<p>闭包的本质应该是某个作用域链对外暴露了一个访问其内部变量的接口，且这个接口可访问的变量是可以被指定的。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ECMAScript基础之 this 关键字的绑定]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之this关键字的绑定</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之this关键字的绑定">
+        </link>
+        <updated>2019-02-22T13:08:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>前排声明，这真的是写 this，没有什么太多新的东西，就是一个自己对 this   绑定规则的总结，也许后期水平提高会从更深的角度去解释 JavaScript 中的 this 绑定规则。本文从分别从绑定全局对象和绑定具体对象的角度总结了一下 this 的绑定规则。</p>
+<h2 id="绑定全局对象">绑定全局对象</h2>
+<p>this 绑定全局对象，分为两种情况：</p>
+<ul>
+<li>直接在全局作用域下使用 this</li>
+<li>被调用的函数不满足绑定具体对象的绑定规则</li>
+</ul>
+<h3 id="直接在全局作用域下使用-this">直接在全局作用域下使用 this</h3>
+<p>这种没什么好说的，全局作用域下调用 this 绑定的是全局对象，例如浏览器中绑定的是 window 对象。</p>
+<pre><code class="language-javascript">console.log(this)
+</code></pre>
+<p>直接拿上面这段代码在浏览器控制台运行下得到的就是全局对象。</p>
+<h3 id="被调用的函数不满足绑定具体对象的绑定规则">被调用的函数不满足绑定具体对象的绑定规则</h3>
+<p>直接使用函数名调用函数</p>
+<pre><code class="language-javascript">function test () {
+    console.log(this);  // window
+}
+
+test();
+
+var test1 = function() {
+    console.log(this);  // window
+}
+
+test1();
+</code></pre>
+<p><a href="https://jsbin.com/zuxedegure/3/edit?js,console">代码传送门</a></p>
+<p>定义某对象的属性为函数，该属性值被赋值被另一变量时。</p>
+<pre><code class="language-javascript">var aObj = {
+    propertyFn: function() {
+        console.log(this.testName);
+    },
+    testName: &quot;aObj&quot;
+};
+
+aObj.propertyFn();  //  &quot;aObj&quot;
+
+var aFn = aObj.propertyFn;
+aFn();  //  undefined
+</code></pre>
+<p><a href="https://jsbin.com/lojaritiji/1/edit?js,console">代码传送门</a></p>
+<h2 id="绑定具体对象">绑定具体对象</h2>
+<p>绑定具体对象的情况较多，可总结为以下几种</p>
+<ul>
+<li>函数作为对象属性被获取并调用</li>
+<li>使用 new 关键字调用函数</li>
+<li>使用 call，apply，bind 调用函数</li>
+<li>函数被注册为事件监听器和事件处理器</li>
+<li>箭头函数中的 this</li>
+</ul>
+<h3 id="函数作为对象属性被获取并调用">函数作为对象属性被获取并调用</h3>
+<p>函数作为对象属性被获取并调用时，函数中的 this 绑定的是获取该属性的对象。考虑如下代码</p>
+<pre><code class="language-javascript">function test() {
+    return this.testName;
+}
+
+var testObj = {
+    testName: &quot;testObj&quot;,
+    getTestName: test,
+    getTestNameFn: function() {
+        return this.testName;
+    }
+}
+
+console.log(testObj.getTestName()); // &quot;testObj&quot; 函数虽然是在全局作用域下定义的，
+                                    // 但是被赋值给了testObj的getTestName属性，且是被作为对象的属性调用的
+console.log(testObj.getTestNameFn());   // &quot;testObj&quot;
+</code></pre>
+<p><a href="https://jsbin.com/befepij/1/edit?js,console">代码传送门</a></p>
+<h3 id="使用-new-关键字调用函数">使用 new 关键字调用函数</h3>
+<p>使用 new 关键字调用函数时，该函数会生成并返回以个新的对象，函数中的 this 绑定的生成的新对象。</p>
+<pre><code class="language-javascript">function Test(name) {
+    this.name = name;
+    console.log(this);
+}
+
+var s = new Test(&quot;s&quot;);  //  {name: &quot;s&quot;}
+function Test1(name) {
+    this.name = name;
+    console.log(this);
+    return true;
+}
+
+var s1 = new Test1(&quot;s1&quot;);   //  {name: &quot;s1&quot;}
+
+function Test2(name) {
+    this.name = name;
+    console.log(this);
+    return {};
+}
+
+var s2 = new Test2(&quot;s2&quot;);   //  {name: &quot;s2&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/yeyatix/1/edit?js,console">代码传送门</a></p>
+<p>上述结果表明，使用 new 调用函数的时候一定会生成一个新对象，且 this 绑定的就是这个新对象，只不过当你在函数中 return 了非 Object 类型的值时，这个对象不会被赋值给你定义的接收变量，这时接收的变量被赋的是函数中使用 return 返回的值。</p>
+<h3 id="使用call-applydind-调用函数">使用call ，apply，dind 调用函数</h3>
+<p>这里call和apply的作用是类似的，都是函数的实例方法，可为函数指定 this 绑定的对象，两者区别在于 apply 的第二个参数是数组，该数组中的值会以实参形式被传递给调用 apply 的函数，而 call 函数除了第一个参数外的参数均被传递给调用 call 的函数。</p>
+<pre><code class="language-javascript">function test(param1, param2) {
+  console.log(this.name, param1 + &quot;, &quot; + param2);
+}
+
+var a = {
+  name: &quot;a&quot;
+};
+
+var b = {
+  name: &quot;b&quot;
+}
+
+test.call(a, &quot;aParam1&quot;, &quot;bParam2&quot;);
+test.apply(b, [&quot;bParam1&quot;, &quot;bParam2&quot;]);
+test();
+</code></pre>
+<p><a href="https://jsbin.com/gofogim/1/edit?js,console">代码传送门</a></p>
+<p>bind函数的作用和以上两者与别很大，其作用是将函数中的 this 绑定对象与指定的对象绑定起来，返回一个函数，每次调用返回的函数时，其 this 都是绑定的指定对象。</p>
+<pre><code class="language-javascript">function test() {
+    console.log(this.name);
+}
+
+var a = {
+    name: &quot;a&quot;
+}
+
+var bindTest = test.bind(a);
+
+bindTest(); // &quot;a&quot;
+
+var b = {
+    name: &quot;b&quot;,
+    getName: bindTest
+}
+
+b.getName();    // &quot;a&quot;
+
+var c = new bindTest(); // undefined
+
+bindTest.call(b);   // &quot;a&quot;
+</code></pre>
+<p><a href="https://jsbin.com/sohuveh/1/edit?js,console">代码传送门</a></p>
+<p>从上面的示例代码可以看出，函数和指定对象被绑定后使用 new 关键字是绑定失效，在以上示例中绑定函数中的 this 绑定的是一个新创建的对象实例，且该对想的构造函数时test函数。由此也可得出，this 绑定场景同时出现的情况下 new 的优先级是高于调用 bind 函数的优先级的。</p>
+<h3 id="箭头函数">箭头函数</h3>
+<p>关于箭头函数中 this 绑定，MDN 中的说法是箭头函数是没有自己的 this 的，其 this 是从其作用域链上层作用域继承而来的。那么怎么理解呢？下面上代码：</p>
+<pre><code class="language-javascript">let arrowFn = () =&gt; {console.log(this === window)};
+arrowFn();  // true
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: arrowFn
+};
+a.getSelf();    // true
+
+let b = {
+    name: &quot;b&quot;
+}
+arrowFn.call(b);    // true
+</code></pre>
+<p><a href="https://jsbin.com/pamejam/edit?js,console">代码传送门</a></p>
+<p>以上代码是箭头函数直接在全局作用域下定义的情况，那么其作用域链上层就是全局作用域，而在浏览器中全局作用域 this 绑定的值是 window 。由于 JavaScript 中的作用域是静态作用域，那么箭头函数在全局作用域中定义时便已经可以确定其 this 就是 window 了，而且后面的该箭头函数作为对象属性值被调用，还是使用 call 显示指定 this 其 this 均为改变。而非箭头函数的画风是这样的：</p>
+<pre><code class="language-javascript">let fn = function() {
+    console.log(this === window);
+}
+fn();   // true
+let a = {
+    name: &quot;a&quot;,
+    getSelf: fn
+};
+a.getSelf();    // false
+
+let b = {
+    name: &quot;b&quot;
+}
+fn.call(b);    // false
+
+</code></pre>
+<p><a href="https://jsbin.com/wolegif/1/edit?js,console">代码传送门</a></p>
+<p>那么是不是一旦箭头函数被定义了，其 this 的绑定就已经被确定了呢？</p>
+<pre><code class="language-javascript">let createArrowFn = function() {
+    return () =&gt; {console.log(this)};
+}
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: createArrowFn
+};
+let aArrow = a.getSelf();   
+aArrow();    // 对象a
+
+let b = {
+    name: &quot;b&quot;
+}
+var bArrow = createArrowFn.call(b);  
+bArrow();   // {name: &quot;b&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/goyidom/1/edit?js,console">代码传送门</a></p>
+<p>上面代码两次 this 打印的结果是不一样的，那么是不是就推翻了箭头函数一旦被定义，其 this 就已经确定了的结论。其实不然，这里箭头函数的是上层作用域是createArrowFn这个函数的作用域，这个函数作用域中的 this 会随着调用场景的不同发生发生变化，所以继承其作用域绑定 this 的箭头函数中的 this 自然也会发生改变了。其实箭头函数中的 this 可以这么理解，相当于将函数的上层作用域的 this 用一个变量保存下来，然后在其子函数中使用它。</p>
+<pre><code class="language-javascript">let fn = function() {
+    var _this = this;
+    return function() {
+        console.log(_this);
+    }
+}
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: createArrowFn
+};
+let aArrow = a.getSelf();   
+aArrow();    // 对象a
+
+let b = {
+    name: &quot;b&quot;
+}
+var bArrow = createArrowFn.call(b);  
+bArrow();   // {name: &quot;b&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/kavaxaj/1/edit?js,console">代码传送门</a></p>
+<p>在理解箭头函数中的 this 时只需理解其被定义时所在作用域的 this 绑定的是什么就可以了。</p>
+<h3 id="事件监听器和事件处理器中的-this">事件监听器和事件处理器中的 this</h3>
+<p>先说明不管是事件监听器还是事件处理器中 this 绑定的都是当前触发该事件的节点，即绑定了该事件的元素节点。</p>
+<p>这里主要是区分下事件监听器和事件处理器，事件处理器其实是指 html 标签的 on... 属性定义的函数，比如 onclick=&quot;function() {}&quot;，当然也可以在 JavaScript 中去设置该属性，事件处理器的特点是其只能有一个，因为是 html 标签属性所以可以覆盖。</p>
+<p>事件监听器是指使用addEventListener函数注册的事件回调函数，可同时注册多个。</p>
+<h2 id="结论">结论</h2>
+<p>在讨论 JavaScript 中 this 的绑定值时，其实就是几种情况：</p>
+<ol>
+<li>new 函数时this是新创建的对象</li>
+<li>call, apply, bind 指定的对象</li>
+<li>调用该函数的对象</li>
+<li>箭头函数的 this 取决于其定义时所在作用域的 this 绑定值</li>
+<li>事件监听器和事件处理器的中的 this 绑定的是绑定函数节点</li>
+<li>上面的情况都不是时，严格模式下的 undefined ，非严格模式下的全局变量</li>
+</ol>
+<blockquote>
+<p>以上总结仅仅为粗浅的不同场景下 this 的绑定值的总结，没有从更深的层次（比如ES标准中的定义）去讨论，主要个人<s>时间</s>水平有限，所以大佬请忽略。如有错误欢迎各位指正，不胜感激。</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ECMAScript基础之强制转换]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换">
+        </link>
+        <updated>2019-02-22T13:08:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>本文旨在总结js中强制转换的规则及触发强制转换的几种场景。ES6标准中定义了六种原始类型，分别是Undefined，Null，String，Number，Boolean，Symbol。本文中的强制转换指的是在代码运行时，触发了数值的隐式转换，而不是代码显示的指定转换操作。</p>
+<h2 id="原始类型间强制转换">原始类型间强制转换</h2>
+<p>发生在原始类型之间的转换，以个人的理解是其他类型转换为String，Number或者Boolean类型。</p>
+<h3 id="转换为string类型">转换为String类型</h3>
+<p>其他原始类型转换为String类型通常发生在+两边存在字符串时，会将+另一边的值转换为String类型。<br>
+考虑如下代码：</p>
+<pre><code class="language-javascript">var strAddNum = &quot;test&quot; + 1;
+var numAddStr = 1 + &quot;test&quot;;
+var boolAddStr = true + &quot;test&quot;;
+var undAddStr = undefined + &quot;&quot;;
+var nullAddStr = null + &quot;&quot;;
+console.log(strAddNum);
+console.log(numAddStr);
+console.log(boolAddStr);
+console.log(undAddStr);
+console.log(nullAddStr);
+</code></pre>
+<p><a href="https://jsbin.com/cumugak/1/edit?js,console">代码传送门</a>，以上代码的运行结果均为字符串。其他原始类型转换为String类型基本是其值的字符串形式，具体如下：</p>
+<ul>
+<li>Undefined，&quot;undefined&quot;</li>
+<li>Null，&quot;null&quot;</li>
+<li>Boolean，&quot;true&quot;或&quot;false&quot;</li>
+<li>Number，值为NaN，&quot;NaN&quot;</li>
+<li>Number，值为+0或-0，&quot;0&quot;</li>
+<li>Number，值为+Infinity，&quot;Infinity&quot;</li>
+<li>Number，值为-Infinity，&quot;-Infinity&quot;</li>
+</ul>
+<p>Number转为字符串具体可参考<a href="https://ecma262.docschina.org/#sec-tostring">ES2018 7.1.12.1章节</a></p>
+<p><em>注意：Symbol类型无法转换为String类型。</em></p>
+<h3 id="转换为number类型">转换为Number类型</h3>
+<p>转换为Number类型的情况，+-*/%等运算中，除了+之外其他运算均会转换成Number类型，+运算时需要满足两侧未出现String类型，该值才会被转换为Number类型。+运算时情况较为复杂，后面会专门描述其相关转换规则。考虑如下代码：</p>
+<pre><code class="language-javascript">var trueAddTrue = true + true;
+var trueAddFalse = true + false;
+var trueAdda0 = true + 0;
+var nullAddTrue = null + true;
+var undefinedAdd0 = undefined + 0;
+var strAdd0 = &quot;&quot; + 0;
+console.log(trueAddTrue);
+console.log(trueAddFalse);
+console.log(trueAdda0);
+console.log(nullAddTrue);
+console.log(undefinedAdd0);
+console.log(strAdd0);
+</code></pre>
+<p><a href="https://jsbin.com/tesuvok/edit?js,console">代码传送门</a>，在运行代码之前可以先考虑下以上代码答打印的结果分别是什么？然后再运行，看是否符合你的预期。其他原始类型转换为Number类型的具体如下：</p>
+<ul>
+<li>Undefined，NaN</li>
+<li>Null， +0</li>
+<li>Boolaen，值为true，1</li>
+<li>Boolean，值为false，+0</li>
+<li>String，不可转为Number的，NaN</li>
+<li>String，可转为Number的就是其对应的Number值（具体可参考ES2018 <a href="https://ecma262.docschina.org/#prod-StringNumericLiteral">7.1.3.1</a>）</li>
+</ul>
+<p><em>注意：Symbol类型同样无法转换为Number类型。</em></p>
+<h3 id="转换为boolean类型">转换为Boolean类型</h3>
+<p>转换为Boolean类型的情况较为简单，除了以下情况转换为Boolean类型会是false，其他情况均是true</p>
+<ul>
+<li>Undefined</li>
+<li>Null</li>
+<li>Number，+0，-0，NaN</li>
+<li>String，长度为0的字符串<br>
+这几种false的情况在ES标准中有明确规定<a href="https://ecma262.docschina.org/#sec-toboolean">7.1.2</a></li>
+</ul>
+<h2 id="对象强制转换为原始类型">对象强制转换为原始类型</h2>
+<p>ES中将对象转换为原始类型的算法，大致可描述为三种情形：</p>
+<ol>
+<li>如果该对象设置了[Symbol.toPrimitive]，调用该函数，如果其返回值为非Object类型则返回结果，否则抛出TypeError异常</li>
+<li>若未指定转换提示则转换提示为&quot;default&quot;</li>
+<li>若转换提示为&quot;default&quot;，则将其置为&quot;number&quot;</li>
+<li>当指定转换提示为&quot;number&quot;时先调用该对象的valueOf函数并判断其结果，如果是原始类型则返回结果，否则调用该对象的toString函数并判断其返回结果，如果结果为原始类型则返回，否则抛出异常TypeError</li>
+<li>当指定转换提示为&quot;string&quot;时先调用toString函数并判断其返回结果，如果是原始类型则返回结果，否则调用该对象的valueOf函数并判断其返回结果，如果结果为原始类型则返回，否则抛出异常TypeError</li>
+</ol>
+<p>上述三种情形中第一种情形优先级最高，第二三种情形优先级并列，具体需要根据使用场景判断是哪一种。其中的指定转换提示是ES标准内部调用该算法时指定的。</p>
+<p>第一种情形只有Symbol对象和Date对象内置了[Symbol.toPrimitive]，且该属性的writeable为false，enumerable为false，configurable为true<br>
+对象转换为原始类型时发生的强制转换非特殊情况均为第二种，第三种情况较为少见。在正常编码工作中应该使用第二种情形就够用了，第三种情形几乎不会出现，要了解更多细节可查阅ES标准。</p>
+<pre><code class="language-javascript">var test = {
+  [Symbol.toPrimitive]: function(hint) {
+     console.log(hint)
+  },
+  valueOf: function() {
+      console.log(&quot;valueOf&quot;)
+  },
+  toString: function() {
+      console.log(&quot;toString&quot;)
+  }
+}
+test + &quot;&quot;;  //&quot;default&quot;
+test * 0;   //&quot;number&quot;
+String(test);   //&quot;string&quot;
+</code></pre>
+<p><a href="https://jsbin.com/sobazod/1/edit?js,console">代码传送门</a>上述代码指定了分别指定了test对象的[Symbol.toPrimitive]，valueOf和toString函数，可以观察到并valueoOf和toString函数均未被调用，指定的[Symbol.toPrimitive]函数可以接受一个提示参数，这个参数就是强制转换时的强制转换提示。这样我们在函数中就可以根据转换场景的不同分别返回不同的值。</p>
+<h2 id="原始类型强制转换为对象装箱">原始类型强制转换为对象（装箱）</h2>
+<p>在开始描述这个问题之前，可以先思考一下，都有哪些场景会是强制的将原始类型转换为对象，其实这种场景几乎在js代码中随处可见，考虑如下代码：</p>
+<pre><code class="language-javascript">var str = &quot;testString&quot;;
+str.replace(&quot;test&quot;, &quot;&quot;);
+</code></pre>
+<p>如上代码中定义的str的值并不是一个对象而是一个原始类型String，原始类型显然是没有方法可以调用的。</p>
+<p>实际上这里的str在执行str.replace时str其值会被强制转换为对象，得到一个String类型的实例对象，而该实例的原型上定义了一系列方法，且该实例是无法被获取的，在执行完这行代码后，该实例就会被回收，所以这里的str依然是一个字符串。</p>
+<p>考虑如下代码：</p>
+<pre><code class="language-javascript">var a = 3;
+a.fn = function(){};
+a.fn();
+</code></pre>
+<h2 id="强制转换的几种场景">强制转换的几种场景</h2>
+<p>在js代码中会出现强制转换的场景通常有三种：</p>
+<ul>
+<li>+运算</li>
+<li>-,*,/,%运算</li>
+<li>==比较</li>
+<li>作为判断条件</li>
+</ul>
+<h3 id="运算">+运算</h3>
+<h4 id="一元运算">一元+运算</h4>
+<p>做一元+运算时，均会被强制转为Number类型，例如</p>
+<pre><code class="language-javascript">var a = {
+    [Symbol.toPrimitive]: function(hint) {
+        console.log(hint);  // number
+        if(hint === &quot;number&quot;) {
+            return 2;
+        } else {
+            return 9;
+        }
+    }
+};
+console.log(+a);   // 2
+
+var b = &quot;3&quot;;
+console.log(+b);    // 3
+</code></pre>
+<p><a href="https://jsbin.com/vudupov/1/edit?js,console">代码传送门</a></p>
+<h4 id="二元运算">二元+运算</h4>
+<p>二元+运算为几种强制转换中复杂度仅次于==比较的一种情形，个人总结其转换步骤如下：</p>
+<ol>
+<li>先将两侧数值强制转换为原始类型(未指定转换提示，即转换提示为hint default)；</li>
+<li>若两侧存在String类型，均转换为String类型，则返回两侧拼接的字符串；</li>
+<li>若第2未返回，则两侧数值强制转换为Number类型，返回计算结果；</li>
+</ol>
+<pre><code class="language-javascript">var a = &quot;&quot;;
+var b = {
+    [Symbol.toPrimitive]: function(hint) {
+        console.log(hint);  // &quot;default&quot;
+        if(hint === &quot;default&quot;) {
+            return 2;
+        } else {
+            return 9;
+        }
+    }
+};
+var c = a + b;  //这里b转换为原始类型返回的是Number类型2，由于a是&quot;&quot;，所以b被转换为&quot;2&quot;，后与&quot;&quot;拼接返回&quot;2&quot;
+console.log(c); // &quot;2&quot;
+
+var d = 3;
+var e = {
+    [Symbol.toPrimitive]: function(hint) {
+        console.log(hint);  // &quot;default&quot;
+        if(hint === &quot;default&quot;) {
+            return 2;
+        } else {
+            return 9;
+        }
+    }
+};
+var f = d + e;  //这里e转换为原始类型返回的是Number类型2，由于两侧均没有String类型，则至第3步，强制转换为Number后返回两侧相加的结果5
+console.log(f); // 5
+
+</code></pre>
+<p><a href="https://jsbin.com/kogisiy/1/edit?js,console">代码传送门</a></p>
+<h3 id="-运算">-,*,/,%运算</h3>
+<p>这几个运算符这涉及的强制转换都是转换为Number类型的，所以这里只要搞清楚转换为Number是怎样的过程就可以了。上文中已经对原始类型转换为Number类型做了描述，这里补充一下Object转换为Number的过程：</p>
+<ol>
+<li>将对象转换为原始类型，且转换时会指定转换提示为&quot;number&quot;;</li>
+<li>转换为原始类型后再根据原始类型转换为Number类型进行转换；</li>
+</ol>
+<pre><code class="language-javascript">var a = 8;
+var b = {
+    [Symbol.toPrimitive]: function(hint) {
+        console.log(hint);  // &quot;number&quot;
+        if(hint === &quot;number&quot;) {
+            return 2;
+        } else {
+            return 9;
+        }
+    }
+};
+console.log(a-b);   //  6
+console.log(a/b);   // 4
+console.log(a*b);   // 16
+console.log(a%b);   // 0
+
+console.log(undefined * 0);   //NaN
+console.log(null * -1); // 0
+console.log(false * -1);    //0 
+console.log(true * -1); // -1
+console.log(&quot;1&quot; * -1);  // -1
+</code></pre>
+<p><a href="https://jsbin.com/cocuzez/1/edit?js,console">代码传送门</a></p>
+<h3 id="比较">==比较</h3>
+<h4 id="比较的基础比较"><mark>比较的基础</mark>=比较</h4>
+<p>x === y，其具体比较步骤如下：</p>
+<ol>
+<li>若x和y的类型不一致，返回false；</li>
+<li>若x和y为Number类型，则若x和y中有一个为NaN返回false；若x和y的值相等则返回true；若x是+0，y是-0或者x是-0，y是+0则返回true；其他情况返回false；</li>
+<li>若x和y为Undefined类型，返回true</li>
+<li>若x和y为Null类型，返回true</li>
+<li>若x和y为String类型，其值相同则返回true，否则返回false</li>
+<li>若x和y为Boolean类型，其值均为true或均为false返回true，否则返回false</li>
+<li>若x和y为Symbol类型，其值为同一个Symbol值则返回true，否则返回false</li>
+<li>若x和y为Object类型，其值为同一个对象（其引用地址相同）则返回true，否则返回false</li>
+</ol>
+<h4 id="x-y规则">x == y规则</h4>
+<p>==比较的转换规则虽然稍微多一点，实际上也就几条规则，两侧的数值类型符合哪种就按哪种去转换，只不过有的可能需要转两次，具体如下：</p>
+<ol>
+<li>如果两侧类型相等则直接返回===的结果；</li>
+<li>若x为undefined和y为null或x为null和y为undefined，返回true</li>
+<li>若两侧为String类型和Number类型，将String类型转换为Number类型，继续用==比较</li>
+<li>若有一侧存在Boolean类型，将Boolean类型转换为Number类型，继续用==比较</li>
+<li>若两侧为String，Number或Symbol类型和Object类型，将Object类型转换原始类型，继续用==比较</li>
+<li>其他返回false</li>
+</ol>
+<p>下面列举一些可能有点违反直觉的比较</p>
+<pre><code class="language-javascript">&quot;0&quot; == false; // true
+false == 0; // true
+false == &quot;&quot;; // true
+false == []; // true
+&quot;&quot; == 0; // true
+&quot;&quot; == []; // true
+0 == []; // true
+[] == ![];  //true
+</code></pre>
+<h3 id="作为条件判断">作为条件判断</h3>
+<p>这种情形到没有太多可说的，基本上就是，除了undefined，null，+0，-0，NaN，&quot;&quot;这六个值会被转为false，其他情况均为true;</p>
+<p>出现将不是Boolean类型的值强制转换的情况为</p>
+<ol>
+<li>if(...)</li>
+<li>for(...;...;...)第二个条件表达式</li>
+<li>while(...)和do...while(...)中的条件表达式</li>
+<li>...?...:...三元表达式中的第一个条件表达式</li>
+<li>||和&amp;&amp;</li>
+</ol>
+<h2 id="结论">结论</h2>
+<p>其实上面描述了这么多，日常开发环境中用到比较多的应该是作为判断条件，+，==这三种情况了，这三种中最常见的应该是判断条件的情况了，这种情况反而是最简单的一种了。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ECMAScript基础之类型]]></title>
+        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之类型</id>
+        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之类型">
+        </link>
+        <updated>2019-01-27T13:08:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="类型与值">类型与值</h2>
+<p>值的具体的概念，可以理解为是具体的某一个数据值，其表示的是某个具体的数据。true，&quot;&quot;，&quot;test&quot;，1，2等都是一个具体的值。</p>
+<p>类型是一个抽象的概念，本文中类型的定义为数据值的集合。举个例子true，false这两个值组成了Boolean类型；undefined这个值组成了Undefined类型。</p>
+<h2 id="原始类型">原始类型</h2>
+<p>ES中变量是没有类型的，只有值有类型，所以接下来我们讨论的均是与值相关的问题，和变量没有什么关系。在ES规范中规定了六种原始值，其分别为：</p>
+<ul>
+<li>Undefined</li>
+<li>Null</li>
+<li>Boolean</li>
+<li>Number</li>
+<li>Symbol -- 在ES6中被加入</li>
+<li>String</li>
+</ul>
+<p>ES中对这六种类型的定义分别为</p>
+<h3 id="undeifined类型">Undeifined类型</h3>
+<p>值只有undefined值的类型，undefined值是在代码中直接书写undefined这几个字母，不带引号的(&quot;undefined&quot;)的一个值。</p>
+<pre><code class="language-javascript">console.log(undefined in window); // true
+</code></pre>
+<p>undefined不是保留字，在浏览器的中是一个全局变量，这意味着undefined存在被重新赋值的可能性。这种可能性针对的是老旧的浏览器，由于这一原因我们会在某些库的源码中看到使用void 0来代替undefined，实现了ES5相关标准的浏览器undefined不会被重重新赋值。</p>
+<h3 id="null类型">Null类型</h3>
+<p>值只有null值的类型，null值也是直接书写在代码中的这几个字母组成的值。</p>
+<h3 id="boolean类型">Boolean类型</h3>
+<p>由原始值true和false组成的类型，如果某个值是Boolean类型，那个它一定是true或者false，不存在其他的可能。</p>
+<h3 id="string类型">String类型</h3>
+<p>由零个或多个16位无符号整数组成的有限有序序列原始值的集合</p>
+<h3 id="number类型">Number类型</h3>
+<p>所有可能的IEEE 754-2008 格式的 64 位双精度二进制的原始值的集合，NAN值，正无穷，负无穷</p>
+<h3 id="symbol类型">Symbol类型</h3>
+<p>表示一个唯一的，非字符串的属性键对象的原始值，其集合。</p>
+<h3 id="typeof操作符">typeOf操作符</h3>
+<p>上述原始类型中五种可以使用typyof操作符准确识判断</p>
+<pre><code class="language-javascript">console.log(typeof undefined === &quot;undefined&quot;); // true
+console.log(typeof true === &quot;boolean&quot;); // true
+console.log(typeof 42 === &quot;number&quot;); // true
+console.log(typeof &quot;42&quot; === &quot;string&quot;); // true
+console.log(typeof Symbol() === &quot;symbol&quot;); // true
+</code></pre>
+<p>typeof操作符可能返回的值有七种除了上面列出的五种还有&quot;object&quot;和&quot;function&quot;，也就是说typeof操作符的返回值与原始类型不是一一对应的。</p>
+<pre><code class="language-javascript">console.log(typeof null === &quot;object&quot;);
+console.log(typeof function() {} === &quot;function&quot;);
+</code></pre>
+<blockquote>
+<p>以上代码在线示例https://jsbin.com/voroxam/3/edit?js,console</p>
+</blockquote>
+<p>null值返回&quot;object&quot;其实是一处设计错误，而且在ES设计之初就一直存在，有太多的生产代码依赖这一特性，所以在后继的标准中也无法修复这个错误。</p>
+<blockquote>
+<p>在 JavaScript 最初的实现中，JavaScript 中的值是由一个表示类型的标签和实际数据值表示的。对象的类型标签是 0。由于 null 代表的是空指针（大多数平台下值为 0x00），因此，null的类型标签也成为了 0，typeof null就错误的返回了&quot;object&quot;。</p>
+</blockquote>
+<h2 id="原始类型的封箱与拆箱">原始类型的封箱与拆箱</h2>
+<p>原始类型除了undefined和null外均有其对应的对象，原始类型与其对象在代码实际上常常会相互转换的。考虑如下代码：</p>
+<pre><code class="language-javascript">var a = &quot;test&quot;;
+var b = &quot;testb&quot;
+var c = a.concat(b);
+var d = a + b;
+</code></pre>
+<p>上述代码中c和d得到的是一样的结果，但是结果产生的方式却有所不同，得到c的过程将a在当前运算中转换为String实例，使其可调用String实例对象原型上的concat函数，而在得到d的过程是直接使用运算符+得到结果。</p>
+<p>也就是说一个原始类型在代码中被当做对象的方式去调用的一些方法时，该原始类型会被包装成其对应的类型一个实例对象，该实例对象在需要被封箱的操作完成后就会被回收，从代码中我们无法获取也无需获取这个被包装的实例对象。</p>
+<p>关于拆箱出现的场景，考虑如下代码：</p>
+<pre><code class="language-javascript">var a = new String(&quot;test&quot;);
+var b = new String(&quot;testb&quot;);
+var c = a + b;
+conosle.log(c);
+var d = {name: &quot;test&quot;};
+var e = {name: &quot;teste&quot;};
+var f = d + e;
+console.log(f);
+</code></pre>
+<p>在运行这段代码之前可以先考虑一个问题，对象和对象可以进行+运算么？</p>
+<p>上述a+b和d+e均是两个对象的运算，此处将+两个的值强制转为原始类型字符串后进行的运算，至于此处是如何强制转换的，其转换的规则又是如何，可参考ES标准中的ToPrimitive算法。</p>
+<p>这段封箱与拆箱操作只是有助于理解js代码的运行，实际应用意义不大，之所以记录这个问题是有人遇到过如下代码：</p>
+<pre><code class="language-javascript">var a = 1;
+a.b= function() {};
+a.b();
+</code></pre>
+<p>考虑下上面代码的运行结果，其出现的原因又是什么？</p>
 ]]></content>
     </entry>
 </feed>

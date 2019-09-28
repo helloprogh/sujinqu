@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>JavaScript基础系列之Object.defineProperty() | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">JavaScript基础系列之Object.defineProperty()</h2>
+            <div class="post-date">2019-05-31</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>Object.defineProperty()是 ES 标准中规定的一个可以定义对象属性特征的一个API，之所以会想起这个 API 是因为在上一篇探究instanceof的细节文章中，想要将右侧函数的Symbol.hasInstance属性重新定义，但是不管怎么定义都没有生效。具体代码如下：</p>
+<pre><code class="language-javascript">var A = function() {};
+var a = new A();
+
+console.log('Symbol.hasInstance修改之前', a instanceof A)
+
+A[Symbol.hasInstance] = function() {
+    return false;
+};
+
+console.log('Symbol.hasInstance修改之后', a instanceof A)
+</code></pre>
+<p><a href="https://jsbin.com/luqivup/1/edit?js,console">代码传送门</a></p>
+<p>不敢肯定打印结果的同学，如果是对设置 A 的Symbol.hasInstance可以改变 instanceof 关键字的检测结果有疑问可先参考我的另一篇文章<a href="https://juejin.im/post/5cdc1d38f265da03a54c419a">instanceof使用中可能漏掉的一点细节</a>，如果是只对第二个打印结果有疑问的可以继续往下读。</p>
+<h2 id="先解答上面的问题">先解答上面的问题</h2>
+<p>这里可以明确前言中代码打印的两次结果均是一致的，都是true。了解的同学都知道当我们定义了一个对象的Symbol.hasInstance属性后，我们是可以在函数中自定义instanceof返回结果的。在上面的代码中我设置的是直接返回false，也就是说只要函数我的属性设置生效了，第二次打印的结果应该是false才对。</p>
+<pre><code class="language-javascript">console.log(Object.getOwnPropertyDescriptor(Function.prototype, Symbol.hasInstance));   
+// {
+//   configurable: false,
+//   enumerable: false,
+//   value: function [Symbol.hasInstance]() { [native code] },
+//   writable: false
+// }
+
+var a = function() {}
+console.log(Object.getOwnPropertyDescriptor(a, Symbol.hasInstance)) // undefined
+
+a[Symbol.hasInstance] = function() {
+    return false;
+};
+console.log(Object.getOwnPropertyDescriptor(a, Symbol.hasInstance)) // undefined
+</code></pre>
+<p><a href="https://jsbin.com/lularom/1/edit?js,console">代码传送门</a></p>
+<p>开始时我也是有点费解，随后了解到是函数对象的原型对象上设置了Symbol.hasInstance属性的writable是false，上面代码的运行结果很好的验证了这一点。但是原型上设置的属性特征值，为什么继承了这个原型对象的对象也设置不了这个属性呢，该好好看看Object.defineProperty()的具体特性了。</p>
+<h2 id="可使用的属性特征值">可使用的属性特征值</h2>
+<p>下面列举了可能会被使用的属性特征：</p>
+<ol>
+<li>configurable：描述该属性的特征值是否可被更改，默认为false</li>
+<li>enumerable：描述该属性是否可以可枚举，即使用 for...in，for...of是否可遍历出该属性，默认为false</li>
+<li>value：描述获取该属性值时返回的值，默认为undefined</li>
+<li>writable：描述该属性的值是否可通过=重新赋值，默认为false</li>
+<li>get：描述获取该属性值时调用的函数，并返回函数的结果，默认为undefined</li>
+<li>set：描述该属性被赋值时调用的函数，默认为undefined</li>
+</ol>
+<p>对象的属性可分为两类，一类是直接设置值的属性，被称为数据描述符，我们大多数时候使用的都是数据描述符；另一类是存取描述符，是由setter-getter函数对描述的属性。实际上这两类属性的产生，是因为其使用的属性特征值不同。</p>
+<h3 id="通用的特征值">通用的特征值</h3>
+<p>上述1，2特征值是两类对象属性都可以使用的特征值</p>
+<h4 id="configurable">configurable</h4>
+<p>该特征值的作用主要是描述该属性被设置的特征值否可以被修改，默认情况下是false，也就是说，不设置这个值为true，这个属性的特征值就无法再被定义了，再定义的话会报错，具体可参考如下代码及运行结果。</p>
+<pre><code class="language-javascript">var a = {};
+Object.defineProperty(a, 'confName', {
+    configurable: true,
+    value: 3
+});
+console.log('a.confName的特征描述值', Object.getOwnPropertyDescriptor(a, 'confName'));
+Object.defineProperty(a, 'confName', {
+    value: 5
+})
+console.log('a.confName的值', a.confName);  // 5
+
+Object.defineProperty(a, 'name', {
+    value: 3
+});
+console.log('a.name的特征描述值', Object.getOwnPropertyDescriptor(a, 'name'));
+
+Object.defineProperty(a, 'name', {
+    value: 5
+}); // 不出意外这句会报错
+
+</code></pre>
+<p><a href="https://jsbin.com/xeleqef/1/edit?js,console">代码传送门</a></p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/28/16afebfc6ecf566a?w=637&amp;h=111&amp;f=png&amp;s=16686" alt=""></figure>
+<blockquote>
+<p>Tips：这段代码中有一个关于 writable 的小细节，将在数据描述符小节中解释。</p>
+</blockquote>
+<h4 id="enumerable">enumerable</h4>
+<p>该特征值没有太多说的，就是定义该属性是否可枚举。粗暴点来说，就是当我们使用for...of，for...in等遍历对象属性的手段时是否可以获取到该属性。如果其值为true时就是可枚举的，为false不可枚举。</p>
+<h3 id="数据描述符">数据描述符</h3>
+<p>如果对象属性的特征值使用了 value 或者 writable，那么这个对象属性就属于数据描述符。</p>
+<h4 id="value">value</h4>
+<p>value 描述了该属性是什么值，其值可以是任何 JS 中规定的数据类型。</p>
+<h4 id="writable">writable</h4>
+<p>这个是一个比较有意思的特征值，其可以描述数据描述符的 value 是否可以使用 . 赋值修改，为 true 表示可以修改，false表示不可以修改，数据描述符中该值默认是 false。</p>
+<p>这里有意思的点在于，当你设置writable为false是并不能完全保证该属性的值不会被修改，而是必须配合 configurable 为false才可以完全保证属性不会被修改。上面强调了 <strong>value 是否可以使用 . 赋值修改</strong>，除了这种方式我们还可以使用configurable代码示例中的方式来修改属性的值。具体可参考以下代码：</p>
+<pre><code class="language-javascript">var b = {};
+Object.defineProperty(b, 'name', {
+    configurable: true,
+    value: 3
+});
+b.name = 9;
+console.log('使用 = 重新赋值b.name', b.name);   // 3 对象属性不可 . 赋值修改时，不会报错，只是值不会发生改变 
+
+Object.defineProperty(b, 'name', {
+    value: 9
+});
+console.log('使用definePeoperty重新赋值b.name', b.name);    // 9 赋值成功
+</code></pre>
+<p><a href="https://jsbin.com/xasabad/edit?js,console">代码传送门</a></p>
+<h3 id="存取描述符">存取描述符</h3>
+<p>如果对象属性的特征值使用了 get 或者 set，那么这个对象属性就属于存取描述符。</p>
+<h4 id="get和set中的this">get和set中的this</h4>
+<p>值得注意的是，当我们在get和set中使用this时，this绑定的是当前使用该属性的对象。不一定是设置该值的对象，也就是一个对象a的某个属性name设置了get和set，这个对象是另一个对象b的原型，那么在b上设置name属性时，调用的set函数中的this绑定的是吧，而不是设置了该特征值的a。下面上代码：</p>
+<pre><code class="language-javascript">var c = {};
+Object.defineProperty(c, 'name', {
+	get: function() {
+		return this.test
+	},
+	set: function(value) {
+		this.test = value;
+	}
+});
+var b = {};
+Object.setPrototypeOf(b, c);
+b.name = 'b';   // 此处会调用name属性的set函数
+                // 会将'b'赋值给this.test，而this绑定的是b
+                // 所以相当于在b上设置了test属性并赋值为'b'
+
+console.log('b.name', b.name);  // b 出现这个结果是因为调用了name属性设置的get函数
+                                //get函数返回结果是this.test而this绑定的是b
+console.log('b.test', b.test);  // b 这个test属性是设置在b对象上的
+console.log('c.name', c.name);  // undefined
+console.log('c.test', c.test);  // undefined
+
+var s = 's';
+var d = {};
+Object.defineProperty(d, 'name', {
+	get: function() {
+		return s
+	},
+	set: function(value) {
+		s = value
+	}
+});
+var e = {};
+Object.setPrototypeOf(e, d);
+e.name = 'e';   // 此处会调用set函数，set函数将s赋值为'e'
+
+console.log('s的值', s);    // 'e' 变量s的值因为set函数的调用，而被设置为'e'
+console.log('e.name', e.name);  // 'e' 此处的name属性不是在对象e上的
+                                //而是通过委托查询到的其原型对象d上的那么属性调用get函数返回的值
+console.log('d.name', d.name);  // 'e' 此处name属性是在对象d上真实存在的
+</code></pre>
+<p><a href="https://jsbin.com/ruquzub/1/edit?js,console">代码传送门</a></p>
+<p>通过上面的栗子可以看出，当对象的原型对象设置了某个属性的get或set函数时，对象再使用该属性时都会调用set或get函数，这是的调用效果类似set.call(b, value)，指定了this是当前对象，但是调用的函数还是在对象原型上的那个属性的set函数。</p>
+<h3 id="不能同时使用">不能同时使用</h3>
+<p>如果一个描述符不具有value,writable,get 和 set 任意一个关键字，那么它将被认为是一个数据描述符。如果一个描述符同时有(value或writable)和(get或set)关键字，将会产生一个异常。</p>
+<h2 id="特征值的继承">特征值的继承</h2>
+<p>对象的属性设置的特征值是可能会被以其为原型的对象继承的，不管是在赋值还是在获取值时，都有可能会产生影响。</p>
+<h3 id="value和writable的继承">value和writable的继承</h3>
+<p>这里的继承指的是对象设置某个属性时，该属性的设置会受到其原型对象上的该属性设置的特征值的影响。</p>
+<p>writable设置为false时，以设置该属性的对象为原型的对象，在设置该属性时也会无法设置该值，这不会产生报错，只是属性设置一直无效。</p>
+<pre><code class="language-javascript">var f = {};
+Object.defineProperty(f, 'name', {
+	value: 'f'
+});
+var g = {};
+Object.setPrototypeOf(g, f);
+
+console.log('g.name', g.name);  // 'f'
+g.name = 'g';
+console.log('g.name', g.name); // 'g'
+</code></pre>
+<p><a href="https://jsbin.com/tefapus/edit?js,console">代码传送门</a></p>
+<p>只有writable设置为false时，writable会表现出继承性，而为true时则对以其为原型的对象没有影响。平时我们直接设置的对象属性的writable就是true，回想一下平时的使用确实没有设置不了对象属性的情况。</p>
+<pre><code class="language-javascript">var a = {
+	name: 'a'
+}
+a.id = 'a';
+console.log(Object.getOwnPropertyDescriptor(a, 'name'))
+//configurable: true
+//enumerable: true
+//value: &quot;a&quot;
+//writable: true
+console.log(Object.getOwnPropertyDescriptor(a, 'id'))
+//configurable: true
+//enumerable: true
+//value: &quot;a&quot;
+//writable: true
+var b = {};
+Object.setPrototypeOf(b, a);
+console.log(b.name);    // 'a'
+b.name = 'b';
+console.log(b.name);    // 'b'
+console.log(a.name);    // 'a'
+
+</code></pre>
+<p>value的继承性主要表现在原型链的继承上（就是原型继承，可以参考我的另一篇<a href="https://juejin.im/post/5c7804806fb9a049ad77be6a">理解原型其实是理解原型链</a>）。</p>
+<h3 id="set和get的继承">set和get的继承</h3>
+<p>属性的set和get特征值同样是具有继承性的，且与writable的继承性有条件不同，set和get会一直被继承，只要对象是以设置了该特征值的属性的对象为原型，对象设置或者获取该属性的值时都会调用原型上的get和set函数。</p>
+<pre><code class="language-javascript">var hValue;
+var h = {};
+Object.defineProperty(h, 'name', {
+	set: function(value) {
+	    console.log('h set调用');
+	    hValue = value;
+	},
+	get: function() {
+	    console.log('h get调用')
+	    return hValue;
+	}
+});
+
+var i = {};
+Object.setPrototypeOf(i, h);
+i.name = 'i';   // 会调用h上的set打印'h set调用'
+i.test = 'testi';   
+console.log('hValue', hValue);  // 'i'
+console.log('i.name', i.name);  // 'i' 会调用h上的get打印'h get调用'
+console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
+
+var jValue;
+var j = {};
+Object.defineProperty(j, 'name', {
+	get: function() {
+	    console.log('j get调用')
+	    return jValue;
+	}
+});
+
+var k = {};
+Object.setPrototypeOf(k, j);
+k.name = 'k';   // 会调用h上的set打印'h set调用'
+k.test = 'testk';   
+console.log('jValue', jValue);  // 'k'
+console.log('k.name', k.name);  // 'k' 会调用h上的get打印'j get调用'
+console.log('j.name', j.name);  // 'k' 会调用h上的get打印'j get调用'
+
+</code></pre>
+<p><a href="https://jsbin.com/kapudaq/1/edit?js,console">代码传送门</a></p>
+<p>h是i的原型对象，h的name属性设置了get和set函数，这种设置会让i对象上无法再使用.为name属性赋值，获取name属性值时也只会通过原型委托查找到h上的name。如果在i上使用Object.defineProperty()来定义一个那么属性，那么这个属性是可以被定义在对象i上的。</p>
+<pre><code class="language-javascript">var hValue;
+var h = {};
+Object.defineProperty(h, 'name', {
+	set: function(value) {
+	    console.log('h set调用');
+	    hValue = value;
+	},
+	get: function() {
+	    console.log('h get调用')
+	    return hValue;
+	}
+});
+
+var i = {};
+Object.setPrototypeOf(i, h);
+var iValue;
+Object.defineProperty(i, 'name', {
+	set: function(value) {
+	    console.log('i set调用');
+	    iValue = value;
+	},
+	get: function() {
+	    console.log('i get调用')
+	    return iValue;
+	}
+});   
+i.name = 'i';   // 会调用i上的set函数，打印'i set调用'
+console.log('iValue', iValue);  // 'i'
+console.log('i.name', i.name);  // 'i' 会调用i上的get打印'i get调用'
+console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
+</code></pre>
+<p><a href="https://jsbin.com/gabaset/edit?js,console">代码传送门</a></p>
+<p>通过Object.defineProperty()设置的对象属性依然是遵从原型继承规则，查找属性值会先从对象自身查找属性，如果查找不到通过原型链向上查找，直到查找到原型链顶端，而设置对象属性时只能设置到对象本身。只不过这个原型继承是建立在子对象的属性设置同样是通过Object.defineProperty()定义的属性。</p>
+<h2 id="结论">结论</h2>
+<p>Object.defineProperty()定义属性某种程度上是给程序提供了一个可以去定义属性访问器行为的接口。</p>
+<p>value可以定义使用属性访问器获取对象属性时获取到的值，writable 可以定义使用属性访问器设置属性的值是否被允许；get 可以定义使用属性访问器获取对象属性时再做一些额外操作，set 可以定义使用属性访问器给对象属性赋值时进行一些额外的操作，例如 VUE2 中的双向绑定机制的运用。</p>
+<p>其实属性特征值的继承性在获取属性值时的表现与原型继承基本一致，与原型原型继承不同的是在使用 属性访问器给对象属性赋值时，原型对象上某属性的writable为false会被其子对象继承导致子对象无法使用属性访问器对该属性重新赋值，子对象上也无法设置属性；原型上的某属性的set会被其子对象继承，子对象使用属性访问器设置对象的该属性时会调用原型上的set函数来完成赋值操作。最后，当对象原型和其子对象的属性设置都是用Object.defineProperty()来定义时，属性的特征值是不表现继承性的。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="tag">
+                    JavaScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/IRqR7Jpmy" class="tag">
+                    defineProperty
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/jqZgM-CYX" class="tag">
+                    属性访问器行为
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节">
+                  <h3 class="post-title">
+                    JavaScript基础系列之instanceof细节
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

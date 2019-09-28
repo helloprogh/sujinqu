@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>跨域资源共享 CORS笔记 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">跨域资源共享 CORS笔记</h2>
+            <div class="post-date">2018-11-20</div>
+            
+            <div class="post-content">
+              <h3 id="跨域问题的描述">跨域问题的描述</h3>
+<p>跨域问题是请求不符合浏览器的同源策略导致的，可能存在两种情况：</p>
+<ul>
+<li>浏览器限制了请求的发起</li>
+<li>浏览器成功发送了请求，并且请求成功获得了响应，只不过由于该请求不符合浏览器的同源策略，所以浏览器未将响应内容返回给脚本，并且报错提示产生跨域问题。</li>
+</ul>
+<pre><code class="language-java">post request is No 'Access-Control-Allow-Origin' header is present on the requested resource.
+</code></pre>
+<h3 id="浏览器的同源策略">浏览器的同源策略</h3>
+<blockquote>
+<p>同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。</p>
+</blockquote>
+<h4 id="同源的定义">同源的定义</h4>
+<blockquote>
+<p>如果两个页面的协议，端口（如果有指定）和域名都相同，则两个页面具有相同的源。</p>
+<p>下表给出了相对<code>http://store.company.com/dir/page.html</code>同源检测的示例:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>结果</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>http://store.company.com/dir2/other.html</code></td>
+<td>成功</td>
+<td></td>
+</tr>
+<tr>
+<td><code>http://store.company.com/dir/inner/another.html</code></td>
+<td>成功</td>
+<td></td>
+</tr>
+<tr>
+<td><code>https://store.company.com/secure.html</code></td>
+<td>失败</td>
+<td>不同协议 ( https和http )</td>
+</tr>
+<tr>
+<td><code>http://store.company.com:81/dir/etc.html</code></td>
+<td>失败</td>
+<td>不同端口 ( 81和80)</td>
+</tr>
+<tr>
+<td><code>http://news.company.com/dir/other.html</code></td>
+<td>失败</td>
+<td>不同域名 ( news和store )</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<p>同源策略控制了不同源之间的交互，使用AJAX时会受到同源策略的约束。但是跨域的写操作（链接，重定向，以及表单提交），跨域资源嵌入是被允许的。</p>
+<h3 id="跨域资源共享cors">跨域资源共享（CORS）</h3>
+<p>CORS通过添加一组指定的HTTP首部字段，允许服务器声明哪些源通过浏览器有权限访问哪些资源，根据AJAX发起的HTTP请求的方法的不同，CORS请求分为两类：</p>
+<ul>
+<li>简单请求</li>
+<li>非简单请求</li>
+</ul>
+<p>请求全部满足下述条件则可称为简单请求</p>
+<ul>
+<li>使用下列方法之一：
+<ul>
+<li>GET</li>
+<li>HEAD</li>
+<li>POST</li>
+</ul>
+</li>
+<li>首部字段未超以下集合：
+<ul>
+<li>Accept</li>
+<li>Accept-Language</li>
+<li>Content-Language</li>
+<li>Content-Type(仅限text/plain，multipart/form-data，application/x-www-form-erlencoded三种)</li>
+<li>DPR</li>
+<li>Downlink</li>
+<li>Save-Data</li>
+<li>Viewport-Width</li>
+<li>Width</li>
+</ul>
+</li>
+<li>请求中的任意<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequestUpload"><code>XMLHttpRequestUpload</code></a> 对象均没有注册任何事件监听器；<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequestUpload"><code>XMLHttpRequestUpload</code></a> 对象可以使用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/upload"><code>XMLHttpRequest.upload</code></a> 属性访问。</li>
+<li>请求中没有使用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/ReadableStream"><code>ReadableStream</code></a> 对象。</li>
+</ul>
+<p>不满足上面全部条件的请求称为预检请求，需要先使用OPTIONS方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。</p>
+<h4 id="简单请求过程">简单请求过程</h4>
+<p>假设请求站点为http://example.com，想要访问http://test.com的资源</p>
+<figure data-type="image" tabindex="1"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_simple.png" alt=""></figure>
+<p>分析请求报文和响应报文如下：</p>
+<p>``</p>
+<pre><code class="language-shell">GET /resource/ HTTP/1.1
+Host: test.com
+User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.1b3pre) Gecko/20081130 Minefield/3.1b3pre
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Connection: keep-alive
+Referer: http://example.com/access-control/simpleXSInvocation.html
+Origin: http://example.com
+
+
+HTTP/1.1 200 OK
+Date: Mon, 01 Dec 2008 00:23:53 GMT
+Server: Apache/2.0.61 
+Access-Control-Allow-Origin: *
+Keep-Alive: timeout=2, max=100
+Connection: Keep-Alive
+Transfer-Encoding: chunked
+Content-Type: application/xml
+
+[XML Data]
+</code></pre>
+<p>前面部分为请求首部字段，其中Origin表明该请求来源于http://example.com。</p>
+<p>后面部分为响应首部字段，是来自服务端http://test.com，响应首部字段中Access-Control-Allow-Origin，其值*的表示该资源可与被任意外域访问。如果仅允许来自http://example.com的请求访问，该首部字段可修改为：</p>
+<p>Access-Control-Allow-Origin: http://example.com</p>
+<p><em>注意：该字段的指定只允许一个值，即不能http://example.com,http://example2.com存在，要允许多个源访问一般做法是根据origin字段来设置Access-Control-Allow-Origin字段</em></p>
+<p>一个最基本的CORS请求由两部分构成，请求首部指定Origin来表明自己的身份，服务端响应首部指定Access-Control-Allow-Origin字段来告诉浏览器自己允许什么站点访问自己的资源，浏览器会根据这两部分信息来判断该请求的响应是否应该放行。如果响应首部中未返回Access-Control-Allow-Origin，或者请求站点在该字段指定的允许访问范围之内。浏览器会抛出错误。更多跨域相关字段可参考https://fetch.spec.whatwg.org/#http-access-control-allow-origin</p>
+<h4 id="预检请求过程">预检请求过程</h4>
+<p>预检请求要求必须首先是用OPTIONS方法发起一个预检请求到服五器，以获知服务器是否允许该实际请求，预检请求可以避免跨域请求对服务器的用户数据产生未预期的影响。</p>
+<figure data-type="image" tabindex="2"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_not_simple.png" alt=""></figure>
+<p>非简单请求的过程上图所示，各个字段在请求中的作用具体如下：</p>
+<ul>
+<li>
+<p>预检请求</p>
+<p>浏览器检测到浏览器中发起的请求需要被预检，使用OPTIONS方法发送请求以获取更多服务器信息，该请求不会对服务器资源产生影响。该请求携带了两个与CORS相关的首部字段</p>
+<pre><code>Access-Control-Request-Method: POST
+Access-Control-Request-Headers: X-PINGOTHER, Content-Type
+</code></pre>
+<p>Access-Control-Request-Method 告知服务器，实际请求将使用 POST 方法。</p>
+<p>Access-Control-Request-Headers 告知服务器，实际请求将携带两个自定义请求首部字段：X-PINGOTHER 与 Content-Type。服务器据此决定，该实际请求是否被允许。</p>
+<p>预检响应携带的CORS相关的首部字段</p>
+<pre><code>Access-Control-Allow-Origin: http://example.com
+Access-Control-Allow-Methods: POST, GET, OPTIONS
+Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+Access-Control-Max-Age: 86400
+</code></pre>
+<p>Access-Control-Allow-Methods表明服务器允许客户端使用POST，GET和OPTIONS方法发起请求。其值为逗号分隔的列表</p>
+<p>Access-Control-Allow-Headers表明服务器允许请求中携带字段X-PINGOTHER, Content-Type。其值为逗号分隔的列表</p>
+<p>Access-Control-Max-Age表明该响应的有效时间为86400秒。也就是24小时。在有效时间内，浏览器不用再为统一请求再次发起预检请求。即同样的请求在有效期内会直接发起实际请求而不会先发起预检请求。</p>
+<p><em>注意：浏览器自身维护了一个最大有效时间，如果设置的值超过了最大有效时间，将不会生效（在Firefox中上限时24小时，在Chromium中是10分钟。另外Chroium同时规定了一个默认值5秒。如果该首部字段值设置为-1，表示禁用缓存，每次请求都需要预检。</em></p>
+</li>
+<li>
+<p>实际请求</p>
+<p>通过了预检请求，实际请求就和简单请求一样，会有一个Origin头信息字段。服务器回应一个Access-control-Allow-Origin首部字段。</p>
+</li>
+</ul>
+<h3 id="跨域cookie问题">跨域cookie问题</h3>
+<p>CORS请求默认不发送Cookie和HTTP认证信息。如果要发送到服务器，一方面需要服务器设置header首部字段Access-Control-Allow-Credentials:true</p>
+<p>，另一方面请求发送者在发送请求时需要设置打开AJAX请求中的withCredentials属性。</p>
+<p><em>注意：要发送cookie，Access-Control-Allow-Origin值就不能设置为全部允许，只能明确指定和请求一致的域名。</em></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/EqyOP3PXR" class="tag">
+                    network
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/HAbnfqxmOA" class="tag">
+                    CORS
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

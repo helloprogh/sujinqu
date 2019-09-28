@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>JavaScript基础系列之原型链 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">JavaScript基础系列之原型链</h2>
+            <div class="post-date">2019-05-08</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>原型和原型链，说是两个词，其实理解一个就可以了。这两个概念是同时存在的，不可能抛开一个去谈论另外一个，或者说这两个概念结合在一起才会发挥作用，甚至原型的存在是因为有原型链的存在，不在原型链上的原型只能称之为对象。</p>
+<h2 id="原型链">原型链</h2>
+<p>先来说说原型链是个什么东东，说起链我们现在脑海中描绘一下自己对链这个字的第一反应是什么，是社会我大哥的大金链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="">是二哈的大狗链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt=""><br>
+还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt=""></p>
+<p>皮一下，下面我们正经说原型链，原型链从本质上来讲应该是个链表结构，也就是和上面的单链表有点像，我们把上图中的next换成__proto__属性，data换成键值对集合，这样经常在控制台输出对象的同学会不会有点熟悉的感觉？</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt=""></figure>
+<h3 id="举个栗子">举个栗子</h3>
+<p>下面举个庸俗的例子，有一个对象人，有move和sleep属性，人中又有男人具有sex属性，男人中又有一类人程序员具有code和hair（其值为less）属性，现在我们想用一个对象来表达程序员，那么这个对象应该同时具备人，男人，程序员的属性，我们用原型链来表达他们，就像这样</p>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt=""></figure>
+<p>原型链具备的特征是能够从下往上查找属性，利于当我在要programmer对象中读取sex属性时，浏览器引擎会先在programmer对象中查找该属性，如果未查找到，那么通过其__proto__找到man对象，在man对象中去查找，在man对象中查找到了sex属性，并获取其值‘man’将其返回，就完成了一次属性查找。同理如果要通过programmer获取move，也是这样层层查找自身属性并通过__proto__往上查找。</p>
+<p>程序员的睡觉时间与一般人不同，因此需要定义自己的sleep方法，直接在programmer对象上设置sleep属性，那么programmer对象就具有了自己的sleep属性，当通过程序员获取sleep属性时获取到的就是自己定义的sleep属性，也就是说同样都是person，此刻的programmer的sleep已不是peroson的sleep。</p>
+<h3 id="原型链的特征">原型链的特征</h3>
+<p>通过上上面的例子，我们不难得出原型链具有的两个基本特征：</p>
+<ol>
+<li>查找属性时可顺链向上查找</li>
+<li>设置属性时只能设置当前对象的属性，而不会影响其上层链上的对象属性</li>
+</ol>
+<p>第一点特征常常被人们称为继承，但是应该不能算是真正的继承，只能说在表现上与继承无异。真正意义上的继承是你从某处学会了某项能力，就算只有你一个人的时候你也是具备这项能力的，但是我们的原型链更应该是一个委托链，你可以通过这个委托链获取这个链上自你之后所有对象的能力，如果这个链发生变化你可能会失去某项能力。继承是对象本身具有这个能力或者特性，而原型委托是你及你身后的委托链具备这个能力。当然这对于对象的使用者我们来说是无所谓的，我们不必过分纠结到底是继承还是委托，但是了解事情的本质也是一件不错的事。</p>
+<p>其实原型链具备这两点特征实际上是很自然而然的，这样的表现形式并没有太多刻意的违背正常逻辑的人为规定，我们只需稍微思考其在实际中的作用就能理解。</p>
+<h2 id="__proto__和prototype的关系">__proto__和prototype的关系</h2>
+<p>原型的英文是什么来着，嗯，prototype，只要说到原型就会被人们提起的一个词。那么它到底和原型有没有关系呢？这里我要说这个词虽然是原型的意思，其实它和原型并没有什么关系，骚年们以后不要直接在对象上去a.prototype了，这样你大多数情况下得到的只会是undefined(在函数对象上可以获取到值)。能在对象上直接获取其原型的是__proto__，你a.__proto__多数一般都能取到值，这个属性记录了该对象的原型对象地址。</p>
+<h3 id="prototype">prototype</h3>
+<p>这个词其实和原型链是有关系的，和原型真的一点关系没有，其作用是用来指定你使用new关键字调用函数的时候生成实例对象的原型（这个原型后面可能还藏着一条原型链）的。下面上代码</p>
+<pre><code class="language-javascript">var person = {
+  move: function() {
+    console.log('moving')
+  },
+  sleep: function() {
+    console.log('sleeping')
+  }
+};
+
+function Man() {
+  this.sex = 'man'
+}
+
+// 为new Man()得到的对象指定原型对象person
+Man.prototype = person;
+
+function Programmer() {
+  this.hair = 'less';
+  this.code = function() {
+    console.log('coding')
+  }
+}
+
+// 为new Programmer()得到的对象指定原型对象new Man()
+Programmer.prototype = new Man();
+
+var programmer = new Programmer();
+console.log(programmer);
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt=""></figure>
+<p>从上面的代码的运行结果中我们不难看出，prototype的作用只是在特定场景下得到的对象的原型（还有其他多种指定对象原型的方式，下面另开小节说明），且这里指定的不仅仅是原型，当指定man为programmer的原型时，同时也意味着man的原型person及person的原型Object这一整个链都被指定给了programmer。</p>
+<h3 id="__proto__">__proto__</h3>
+<p>上面的运行结果中我们可以看到，在每个对象上都有一个属性__proto__，这个属性不是我们指定的，而且这只是在大多数浏览器中这个属性名是__proto__，这个属性名的作用就是记录对象的原型指向。虽然不一定每个浏览器中都是这个属性名，但是相同的是他们必然都有一个属性用来记录对象的原型。当我们要获取一个对象的原型时应该使用ES的标准API: Object.getPrototypeOf()或者Reflect.getPrototypeOf()（ES6），来获取。</p>
+<h3 id="原型链关系图">原型链关系图</h3>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt=""></figure>
+<p>话说本来只是随便画画的，结果就成了你上面看到那个样子，让我们大家一起来找茬，发现有哪个等式不成立的欢迎在评论区打脸。另表达下个人的对JS中的对象起点观念，我认为是Object.prototype指向的这个对象，不认为是null，不接受反驳（傲娇脸）。关于这一点，这里解释一下，在JS中所有对象的原型链追到最后应该都是Object.prototype指向的对象（通过使用下面的指定原型对象为null的方式的对象除外），上图中所表现的想表明的是具备实际使用意义的原型链起点。</p>
+<p>Object.prototype.__proto__的值是null也就是表明Object.prototype对象是存在这个属性的，因为它不是undefined，但是这个值应该被理解为一个原型链的结束符号更为准一些，使用这个符号是为了能够更好的实现JS引擎，而不是语言具备的标准特性。</p>
+<h2 id="指定对象原型的几种方式">指定对象原型的几种方式</h2>
+<p>总结了下指定对象的原型的几种方法，大体可分为非标准操作，标准API操作，特定场景操作。为了方便举例，我们设定一个场景，对象a有name属性，其值为a，对象b有color属性，其值为red，现在要求将a指定为b的原型。</p>
+<h3 id="非标准操作">非标准操作</h3>
+<p>这个是最简单粗暴的方式，直接设置对象的__proto__属性，像下面这样</p>
+<pre><code class="language-javascript">var a = {name: 'a'};
+var b = {id: 'b'};
+console.log('a的原型是Object.prototype', Object.getPrototypeOf(a) === Object.prototype);    //true
+a.__proto__ = b
+console.log('a的原型是b', Object.getPrototypeOf(a) === b);  //true
+</code></pre>
+<p><a href="https://jsbin.com/doyuroz/1/edit?js,console">代码传送门</a></p>
+<p>这种方式虽然很简单，但是一般不建议在生产代码中使用，这种写法存在兼容性上的问题，这个没有在标准中规定的属性只是靠各浏览器厂商之间的默契维持，兼容性可想而知。其次这种方式在代码的可维护性上不是很好，毕竟不是谁都知道这个属性__proto__(虽然觉得搞前端的同学应该都知道)。</p>
+<h3 id="标准api操作">标准API操作</h3>
+<p>下面来介绍几个指定对象的API（水字数）。</p>
+<h4 id="objectsetprototypeof">Object.setPrototypeOf</h4>
+<p>这个是Object对象的一个静态方法，使用方式如下</p>
+<pre><code class="language-javascript">var a = {name: 'a'};
+var b = {id: 'b'};
+console.log('a的原型是Object.prototype', Object.getPrototypeOf(a) === Object.prototype);    //true
+Object.setPrototypeOf(b);
+console.log('a的原型是b', Object.getPrototypeOf(a) === b);  //true
+</code></pre>
+<p>这个方法使用简单，兼容性好，指定对象的原型首推使用这个方法。</p>
+<h4 id="reflectsetprototypeof">Reflect.setPrototypeOf</h4>
+<p>此API的方式同上，没什么好说的，只是这个ES6标准中提供的方法。按照阮老师的说法，Reflect对象应该会将Object上定义的一些对象操作方法都接收过来。</p>
+<h4 id="objectcreate">Object.create</h4>
+<p>Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。 下面上代码</p>
+<pre><code class="language-javascript">var b = {id: 'b'};
+var c = Object.create(b, {
+    name: {
+    	value: 'a'     
+    }
+});
+console.log('a的原型是b', Object.getPrototypeOf(c) === b);  //true
+</code></pre>
+<p>使用Object.create()方法会得到一个指定属性的新对象，这个方法的第一个参数可以指定新得到对象的原型，第二个参数可以指定对象属性值等。</p>
+<blockquote>
+<p>如果你想得到一个纯净的的对象（没有原型），可以在上面三个API使用时指定原型对象那个参数传入null</p>
+</blockquote>
+<h3 id="特定场景操作">特定场景操作</h3>
+<p>将使用new关键词调用函数创建实例对象，通过指定函数的prototype属性来指定对象的方式放在特定场景操作，是因为这种方式不具备上面几种方式的灵活性，不能随时随地的修改对象的原型，使用起来也比较麻烦，怎么用大家应该都懂，这里就不多说了。。</p>
+<h2 id="结论">结论</h2>
+<p>通常我们在谈论原型的时候，应该都是在谈论这种设计模式，这应该是一种思想，一种解决问题的方式，我们对它的理解不应该仅仅停留在对机制的理解上。这种模式的优点在于你只需要在原型上的添加某个属性，指向该原型的所有对象都会具有这个属性，而不用一个一个的去给这些对象添加这个属性。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="tag">
+                    JavaScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/UiEY_5bYq" class="tag">
+                    原型
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/tp9XdLXEC" class="tag">
+                    原型链
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/closureBylet">
+                  <h3 class="post-title">
+                    ECMAScript基础之通过let说闭包
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

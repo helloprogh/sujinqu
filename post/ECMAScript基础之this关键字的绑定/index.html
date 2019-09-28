@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>ECMAScript基础之 this 关键字的绑定 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ECMAScript基础之 this 关键字的绑定</h2>
+            <div class="post-date">2019-02-22</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>前排声明，这真的是写 this，没有什么太多新的东西，就是一个自己对 this   绑定规则的总结，也许后期水平提高会从更深的角度去解释 JavaScript 中的 this 绑定规则。本文从分别从绑定全局对象和绑定具体对象的角度总结了一下 this 的绑定规则。</p>
+<h2 id="绑定全局对象">绑定全局对象</h2>
+<p>this 绑定全局对象，分为两种情况：</p>
+<ul>
+<li>直接在全局作用域下使用 this</li>
+<li>被调用的函数不满足绑定具体对象的绑定规则</li>
+</ul>
+<h3 id="直接在全局作用域下使用-this">直接在全局作用域下使用 this</h3>
+<p>这种没什么好说的，全局作用域下调用 this 绑定的是全局对象，例如浏览器中绑定的是 window 对象。</p>
+<pre><code class="language-javascript">console.log(this)
+</code></pre>
+<p>直接拿上面这段代码在浏览器控制台运行下得到的就是全局对象。</p>
+<h3 id="被调用的函数不满足绑定具体对象的绑定规则">被调用的函数不满足绑定具体对象的绑定规则</h3>
+<p>直接使用函数名调用函数</p>
+<pre><code class="language-javascript">function test () {
+    console.log(this);  // window
+}
+
+test();
+
+var test1 = function() {
+    console.log(this);  // window
+}
+
+test1();
+</code></pre>
+<p><a href="https://jsbin.com/zuxedegure/3/edit?js,console">代码传送门</a></p>
+<p>定义某对象的属性为函数，该属性值被赋值被另一变量时。</p>
+<pre><code class="language-javascript">var aObj = {
+    propertyFn: function() {
+        console.log(this.testName);
+    },
+    testName: &quot;aObj&quot;
+};
+
+aObj.propertyFn();  //  &quot;aObj&quot;
+
+var aFn = aObj.propertyFn;
+aFn();  //  undefined
+</code></pre>
+<p><a href="https://jsbin.com/lojaritiji/1/edit?js,console">代码传送门</a></p>
+<h2 id="绑定具体对象">绑定具体对象</h2>
+<p>绑定具体对象的情况较多，可总结为以下几种</p>
+<ul>
+<li>函数作为对象属性被获取并调用</li>
+<li>使用 new 关键字调用函数</li>
+<li>使用 call，apply，bind 调用函数</li>
+<li>函数被注册为事件监听器和事件处理器</li>
+<li>箭头函数中的 this</li>
+</ul>
+<h3 id="函数作为对象属性被获取并调用">函数作为对象属性被获取并调用</h3>
+<p>函数作为对象属性被获取并调用时，函数中的 this 绑定的是获取该属性的对象。考虑如下代码</p>
+<pre><code class="language-javascript">function test() {
+    return this.testName;
+}
+
+var testObj = {
+    testName: &quot;testObj&quot;,
+    getTestName: test,
+    getTestNameFn: function() {
+        return this.testName;
+    }
+}
+
+console.log(testObj.getTestName()); // &quot;testObj&quot; 函数虽然是在全局作用域下定义的，
+                                    // 但是被赋值给了testObj的getTestName属性，且是被作为对象的属性调用的
+console.log(testObj.getTestNameFn());   // &quot;testObj&quot;
+</code></pre>
+<p><a href="https://jsbin.com/befepij/1/edit?js,console">代码传送门</a></p>
+<h3 id="使用-new-关键字调用函数">使用 new 关键字调用函数</h3>
+<p>使用 new 关键字调用函数时，该函数会生成并返回以个新的对象，函数中的 this 绑定的生成的新对象。</p>
+<pre><code class="language-javascript">function Test(name) {
+    this.name = name;
+    console.log(this);
+}
+
+var s = new Test(&quot;s&quot;);  //  {name: &quot;s&quot;}
+function Test1(name) {
+    this.name = name;
+    console.log(this);
+    return true;
+}
+
+var s1 = new Test1(&quot;s1&quot;);   //  {name: &quot;s1&quot;}
+
+function Test2(name) {
+    this.name = name;
+    console.log(this);
+    return {};
+}
+
+var s2 = new Test2(&quot;s2&quot;);   //  {name: &quot;s2&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/yeyatix/1/edit?js,console">代码传送门</a></p>
+<p>上述结果表明，使用 new 调用函数的时候一定会生成一个新对象，且 this 绑定的就是这个新对象，只不过当你在函数中 return 了非 Object 类型的值时，这个对象不会被赋值给你定义的接收变量，这时接收的变量被赋的是函数中使用 return 返回的值。</p>
+<h3 id="使用call-applydind-调用函数">使用call ，apply，dind 调用函数</h3>
+<p>这里call和apply的作用是类似的，都是函数的实例方法，可为函数指定 this 绑定的对象，两者区别在于 apply 的第二个参数是数组，该数组中的值会以实参形式被传递给调用 apply 的函数，而 call 函数除了第一个参数外的参数均被传递给调用 call 的函数。</p>
+<pre><code class="language-javascript">function test(param1, param2) {
+  console.log(this.name, param1 + &quot;, &quot; + param2);
+}
+
+var a = {
+  name: &quot;a&quot;
+};
+
+var b = {
+  name: &quot;b&quot;
+}
+
+test.call(a, &quot;aParam1&quot;, &quot;bParam2&quot;);
+test.apply(b, [&quot;bParam1&quot;, &quot;bParam2&quot;]);
+test();
+</code></pre>
+<p><a href="https://jsbin.com/gofogim/1/edit?js,console">代码传送门</a></p>
+<p>bind函数的作用和以上两者与别很大，其作用是将函数中的 this 绑定对象与指定的对象绑定起来，返回一个函数，每次调用返回的函数时，其 this 都是绑定的指定对象。</p>
+<pre><code class="language-javascript">function test() {
+    console.log(this.name);
+}
+
+var a = {
+    name: &quot;a&quot;
+}
+
+var bindTest = test.bind(a);
+
+bindTest(); // &quot;a&quot;
+
+var b = {
+    name: &quot;b&quot;,
+    getName: bindTest
+}
+
+b.getName();    // &quot;a&quot;
+
+var c = new bindTest(); // undefined
+
+bindTest.call(b);   // &quot;a&quot;
+</code></pre>
+<p><a href="https://jsbin.com/sohuveh/1/edit?js,console">代码传送门</a></p>
+<p>从上面的示例代码可以看出，函数和指定对象被绑定后使用 new 关键字是绑定失效，在以上示例中绑定函数中的 this 绑定的是一个新创建的对象实例，且该对想的构造函数时test函数。由此也可得出，this 绑定场景同时出现的情况下 new 的优先级是高于调用 bind 函数的优先级的。</p>
+<h3 id="箭头函数">箭头函数</h3>
+<p>关于箭头函数中 this 绑定，MDN 中的说法是箭头函数是没有自己的 this 的，其 this 是从其作用域链上层作用域继承而来的。那么怎么理解呢？下面上代码：</p>
+<pre><code class="language-javascript">let arrowFn = () =&gt; {console.log(this === window)};
+arrowFn();  // true
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: arrowFn
+};
+a.getSelf();    // true
+
+let b = {
+    name: &quot;b&quot;
+}
+arrowFn.call(b);    // true
+</code></pre>
+<p><a href="https://jsbin.com/pamejam/edit?js,console">代码传送门</a></p>
+<p>以上代码是箭头函数直接在全局作用域下定义的情况，那么其作用域链上层就是全局作用域，而在浏览器中全局作用域 this 绑定的值是 window 。由于 JavaScript 中的作用域是静态作用域，那么箭头函数在全局作用域中定义时便已经可以确定其 this 就是 window 了，而且后面的该箭头函数作为对象属性值被调用，还是使用 call 显示指定 this 其 this 均为改变。而非箭头函数的画风是这样的：</p>
+<pre><code class="language-javascript">let fn = function() {
+    console.log(this === window);
+}
+fn();   // true
+let a = {
+    name: &quot;a&quot;,
+    getSelf: fn
+};
+a.getSelf();    // false
+
+let b = {
+    name: &quot;b&quot;
+}
+fn.call(b);    // false
+
+</code></pre>
+<p><a href="https://jsbin.com/wolegif/1/edit?js,console">代码传送门</a></p>
+<p>那么是不是一旦箭头函数被定义了，其 this 的绑定就已经被确定了呢？</p>
+<pre><code class="language-javascript">let createArrowFn = function() {
+    return () =&gt; {console.log(this)};
+}
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: createArrowFn
+};
+let aArrow = a.getSelf();   
+aArrow();    // 对象a
+
+let b = {
+    name: &quot;b&quot;
+}
+var bArrow = createArrowFn.call(b);  
+bArrow();   // {name: &quot;b&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/goyidom/1/edit?js,console">代码传送门</a></p>
+<p>上面代码两次 this 打印的结果是不一样的，那么是不是就推翻了箭头函数一旦被定义，其 this 就已经确定了的结论。其实不然，这里箭头函数的是上层作用域是createArrowFn这个函数的作用域，这个函数作用域中的 this 会随着调用场景的不同发生发生变化，所以继承其作用域绑定 this 的箭头函数中的 this 自然也会发生改变了。其实箭头函数中的 this 可以这么理解，相当于将函数的上层作用域的 this 用一个变量保存下来，然后在其子函数中使用它。</p>
+<pre><code class="language-javascript">let fn = function() {
+    var _this = this;
+    return function() {
+        console.log(_this);
+    }
+}
+
+let a = {
+    name: &quot;a&quot;,
+    getSelf: createArrowFn
+};
+let aArrow = a.getSelf();   
+aArrow();    // 对象a
+
+let b = {
+    name: &quot;b&quot;
+}
+var bArrow = createArrowFn.call(b);  
+bArrow();   // {name: &quot;b&quot;}
+</code></pre>
+<p><a href="https://jsbin.com/kavaxaj/1/edit?js,console">代码传送门</a></p>
+<p>在理解箭头函数中的 this 时只需理解其被定义时所在作用域的 this 绑定的是什么就可以了。</p>
+<h3 id="事件监听器和事件处理器中的-this">事件监听器和事件处理器中的 this</h3>
+<p>先说明不管是事件监听器还是事件处理器中 this 绑定的都是当前触发该事件的节点，即绑定了该事件的元素节点。</p>
+<p>这里主要是区分下事件监听器和事件处理器，事件处理器其实是指 html 标签的 on... 属性定义的函数，比如 onclick=&quot;function() {}&quot;，当然也可以在 JavaScript 中去设置该属性，事件处理器的特点是其只能有一个，因为是 html 标签属性所以可以覆盖。</p>
+<p>事件监听器是指使用addEventListener函数注册的事件回调函数，可同时注册多个。</p>
+<h2 id="结论">结论</h2>
+<p>在讨论 JavaScript 中 this 的绑定值时，其实就是几种情况：</p>
+<ol>
+<li>new 函数时this是新创建的对象</li>
+<li>call, apply, bind 指定的对象</li>
+<li>调用该函数的对象</li>
+<li>箭头函数的 this 取决于其定义时所在作用域的 this 绑定值</li>
+<li>事件监听器和事件处理器的中的 this 绑定的是绑定函数节点</li>
+<li>上面的情况都不是时，严格模式下的 undefined ，非严格模式下的全局变量</li>
+</ol>
+<blockquote>
+<p>以上总结仅仅为粗浅的不同场景下 this 的绑定值的总结，没有从更深的层次（比如ES标准中的定义）去讨论，主要个人<s>时间</s>水平有限，所以大佬请忽略。如有错误欢迎各位指正，不胜感激。</p>
+</blockquote>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_" class="tag">
+                    ECMAScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/ZhcrjCkSa" class="tag">
+                    this
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换">
+                  <h3 class="post-title">
+                    ECMAScript基础之强制转换
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

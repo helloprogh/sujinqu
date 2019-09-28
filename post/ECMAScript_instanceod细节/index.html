@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>JavaScript基础系列之instanceof细节 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">JavaScript基础系列之instanceof细节</h2>
+            <div class="post-date">2019-05-19</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>在面向对象语言中，一般都有关键字 instanceof 来检测对象类型，更准确点来说是检测对象是哪个类型的实例。那么在 JS 中这个关键字又有什么不同之处呢？此文仅是一篇对 ES 标准中 instanceof 关键字的解读，并记录了在此过程中的对 JS 中对象系统的一点小感悟。</p>
+<h2 id="标准规定该关键字需要做什么">标准规定该关键字需要做什么</h2>
+<p>先举例 a instanceof b, 下文中的步骤解释中关键字左侧的值用a表示， 右侧的值用b表示。</p>
+<p>在标准中 instanceof 的行为被抽象到 InstanceofOperator 操作中，下面列出比较关键的两个抽象操作，并根据自己的理解对整理了下步骤：</p>
+<ul>
+<li>InstanceofOperator ( a, b)；</li>
+<li>OrdinaryHasInstance ( b, a )；</li>
+</ul>
+<h3 id="instanceofoperator-a-b">InstanceofOperator ( a, b)</h3>
+<ol>
+<li>检测b是否是对象，否TypeError</li>
+<li>获取b是否定义了Symbol.hasInstance</li>
+<li>是则b[Symbol.hasInstance](a)，返回true或false</li>
+<li>否则判断b是否是函数，否则TypeError</li>
+<li>是则返回OrdinaryHasInstance(b, a)的运行结果</li>
+</ol>
+<h3 id="ordinaryhasinstance-b-a">OrdinaryHasInstance ( b, a )</h3>
+<ol start="6">
+<li>判断b是否是函数，否则返回false（这一步在这一场景中应该不会被调用）</li>
+<li>是则判断b是否是被bind包装过的函数，是则获取到bind包装的函数bc，并调用InstanceofOperator( a, bc)</li>
+<li>是则检测a是否是对象，否则返回false</li>
+<li>是则获取b的prototype属性bp</li>
+<li>如果bp不是对象则返回TypeError</li>
+<li>获取a的原型并赋值给a</li>
+<li>检测a是否为null，是则返回false</li>
+<li>否则判断a和bp是否相等，是则返回true</li>
+<li>否则重复步骤11~14直至返回true或false</li>
+</ol>
+<h2 id="几处细节的推敲">几处细节的推敲</h2>
+<p>在查看标准解释是，有几处理解的不是很明白，故使用几个demo对自己的理解做了验证</p>
+<h3 id="b应该是什么值">b应该是什么值</h3>
+<p>先看b不是对象是什么情况<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt=""></p>
+<p>从上面的结果可以看到报错了，而且错误提示很明显的提示右侧的值不是对象，这是第1步检测报的错，那么如果是对象，而不是函数对象又会是什么情况呢？</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt=""></figure>
+<p>嗯，没错，对象也报错了，这次的错误是右侧的值不可调用，即不是函数，这应是第4步检测报的错了。根据上面的步骤试试给对象设置Symbol.hasInstance属性</p>
+<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt=""><br>
+这一次没有报错，检测正常进行了，且返回了在函数中定义的结果，根据上面的步骤和代码验证，可以得出右侧的值可以是设置了Symbol.hasInstance属性的对象。且检测的结果会被右侧值定义的Symbol.hasInsyance函数拦截成函数返回的结果。</p>
+<p>右侧是函数的情况就是比觉正常的返回了，需要明确的一点是函数是不能直接设置Symbol.hasInstance属性的，具体原因，感兴趣的可以继续查阅资料。到这里可以得出结论，b必须是设置了Symbol的对象或者函数，否则会报错。</p>
+<h3 id="被-dind-包装过的函数依然会返回原函数原型检测结果">被 dind 包装过的函数依然会返回原函数原型检测结果</h3>
+<p>这一步存疑的原因是，没有直接理解标准中的描述，只是有所猜测，不能确定，故验证之。</p>
+<pre><code class="language-javascript">var a = function() {
+   this.name = 'a';
+}; 
+var b = {testName: 'b'};
+a.prototype = b;
+
+var c = new a();
+console.log('c instanceof a', c instanceof a);   // true
+
+var h = {name: 'h'};
+var s = a.bind(h);
+console.log('c instanceof s', c instanceof s);   // true
+</code></pre>
+<p><a href="https://user-gold-cdn.xitu.io/2019/5/19/16ad065d3992af89">代码传送门</a></p>
+<p>如上代码示例，从其运行结果可知，a.prototype 是等于 c 的原型的，s 是 a 被 bind 对象 h 后返回的函数，从验证结果来看，函数经过 bind 的一层包装，依然不会影响其原型检测的绑定。</p>
+<h2 id="一点思考">一点思考</h2>
+<p>在推敲上面细节时突然联想到这种检测实际是很合理的，类比 Java 中的检测类，这里对象的原型不就可以类比成 Java 里面的类么。 某个对象的原型是什么决定它具备了原型对象的特性的，而类不也是这样么，该对象属于哪个类，决定了该对象具备了哪些特性。不同的是，在JS中的检测是往继承链上多退了一步的，Java 中是直接检测对象是否是该类的实例，而JS中是检测的是对象的原型是否等于函数的prototype属性，这应该就是继承原理不同产生的区别吧。</p>
+<p>之前从未认真的思考过，JS 中的整个对象系统是什么样的，虽然现在也还是没有理解太多，但是至少现在在我的认知里 JS 的<br>
+对象系统是简单而完善的，并没有因为简单而缺少了面向对象基本特性。虽然它灵活的允许你随便更改一个对象的原型，也就是类，但是这依然不妨碍它成为一门可以面像对象编程的语言。</p>
+<h2 id="结论">结论</h2>
+<p>instanceof 关键字检测的本质是检测左侧对象的原型链上是否存在和右侧函数的prototype属性相等的对象，如果存在则返回true，如果不存在则返回false。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="tag">
+                    JavaScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/tFElrQrrh" class="tag">
+                    instanceof
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_prototype">
+                  <h3 class="post-title">
+                    JavaScript基础系列之原型链
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

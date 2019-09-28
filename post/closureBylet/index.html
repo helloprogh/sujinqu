@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>ECMAScript基础之通过let说闭包 | 苏进取</title>
+<meta name="description" content="凝视深渊">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
+        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
+        <h1 class="site-title">苏进取</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      凝视深渊
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ECMAScript基础之通过let说闭包</h2>
+            <div class="post-date">2019-04-20</div>
+            
+            <div class="post-content">
+              <h2 id="前言">前言</h2>
+<p>标题虽说是讲模块化的，其实这是一篇讲闭包的文章（没错，这就是不要脸的标题党）。</p>
+<p>闭包这个概念并不是 JavaScript 的专利，本篇中描述的闭包均是 JavaScript 中的闭包，其相关的描述也均是围绕 JavaScript 来的。在 JavaScript 中闭包是很常见的，有时甚至不经意间就写出来了，可能自己还没有意识到。比如下面</p>
+<pre><code class="language-javascript">
+{
+    let a = 'a';
+    function getBlockA() {
+        return a;
+    }
+    let b = 'b';
+} 
+</code></pre>
+<p>可能有人会质疑这不是闭包，因为这根本不像，别着急反对，下面我们一起来看下这样的写法是否产生了闭包。</p>
+<h2 id="闭包的定义">闭包的定义</h2>
+<p>对于闭包的描述通常有两种：</p>
+<ul>
+<li>闭包是在其词法上下文中引用了非其局部变量的变量的函数</li>
+<li>闭包是由函数和与其相关的引用环境组合而成</li>
+</ul>
+<p>上面两种描述一定程度上是对立的，一个描述的是函数，一个描述的是函数和其引用环境组成的整体。闭包只是使用和外在表现上很像函数，但是实际上并不是函数，所以第二种说法应该更为准确一些。当然在 JS 中第一种描述也是没有什么问题的，因为 JS 中能够带着被其访问的变量到处跑的只有函数了。</p>
+<h2 id="闭包出现的条件">闭包出现的条件</h2>
+<p>其实闭包出现的条件并不复杂，在局部作用域访问了其他局部作用域中的变量就产生了闭包。也就是只有一个条件：</p>
+<ol>
+<li>在局部作用域中访问了其他局部变量</li>
+</ol>
+<p>是不是比想象中的更容易得到一个闭包呢，其实在我写之前也对闭包的产生有些误解，开始理解的被定义的局部作用域必须要被使用了才会产生闭包，我们可以借助chrome的调试工具中的作用域显示来理解闭包的产生。<br>
+考虑如下代码：</p>
+<pre><code class="language-javascript">function outer() {
+    var outerVar = 'outer';
+    function inner() {
+        return outerVar;
+    }
+}
+outer();
+</code></pre>
+<p>上面的代码是否产生了闭包呢？我们来看下调试工具中是怎么体现的</p>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt=""></figure>
+<p>如上图可见在outer函数的结尾大括号处打上断点，可以查看outer函数的作用域（结尾处打断点可以更准确的获得所用变量的值），上图中标识outer处的scope表示的就是断点处所在作用域的变量，Locale就是outer函数作用域中定义的变量集合，Global表示的可访问的全局变量集合。</p>
+<p>outer的Scope中的locale里面可以看到变量outerVar，inner，其中outerVar的值是字符串outer，inner的值是一个函数。</p>
+<p>展开inner函数可以看到该函数的[[Scopes]]，这里没由Local类型的变量，但是有一个Closure，这里没有Locale的原因是inner函数并没有定义变量，而是引用了其父作用域outer函数作用域中的outerVal变量，我们可以在Closure中看到outerVal，这个Closure就是表示的该函数引用的其他局部作用域的变量集合，当一个函数的[[Scopes]]中出现Closure就表示这个函数及其所引用的其他局部作用域变量共同形成了一个闭包。</p>
+<h2 id="闭包中被忽略的细节">闭包中被忽略的细节</h2>
+<p>上面基本搞清了如何产生一个闭包，以及怎么去观察一个闭包，下面说说闭包中通常被忽略（大佬们觉得没什么好说的，菜鸟不知道的一些细节），下面先上一发强者鉴定术（理解的大佬请忽略本节）：</p>
+<pre><code class="language-javascript">
+function outer() {
+    var outerVal = new Array(1000000) ;
+    
+    function consoleOuterVal() {
+        console.log(outerVal);
+    }
+    
+    consoleOuterVal();
+    
+    function inner() {
+        console.log('ok');
+    }
+    
+    return inner;
+};
+
+for(var i=0; i&lt;10000; i++) {
+    outer();
+}
+
+</code></pre>
+<p>这段代码中是存在问题的，下面说下具体什么问题。</p>
+<h3 id="共享闭包">共享闭包</h3>
+<p>上面的代码中存在内存泄漏问题，下面通过调试工具看下这段代码的情况：</p>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt=""></figure>
+<p>通过上图可见consoleOuterVal和inner函数的[[Scopes]]中均出现了Closure，且其保存的变量均为outerVal，inner中没用引用outerVal变量，怎么会该变量会出现在其Closure中呢？这实际上是在得到函数Closure中的变量时，JS引擎会把作用域下的所有闭包变量放在一起，在该作用域下定义的函数都会得到一个相同的Closure。这样的话上面的inner也会拥有和consoleOuterVal函数一样变量引用，且该变量一直无法释放，随着循环的增加，内存自然就不够用了。</p>
+<p>关于共享闭包的 更多细节探讨可访问<a href="https://juejin.im/post/5c723d90f265da2dc0065bdb">前端小秘密系列之闭包</a>（非本人，这里不要脸的引用下）。</p>
+<h3 id="不建议使用eval的原因">不建议使用eval的原因</h3>
+<p>在很多编码规范中都会明确提到不要使用eval函数，或者使用时需要小心谨慎。<br>
+考虑如下代码中inner的Closure：</p>
+<pre><code>function outer() {
+    var outerVal = new Array(1000000) ;
+    var str = &quot;test&quot;;
+    
+    eval('console.log(&quot;test&quot;)')
+    
+    function inner() {
+        console.log('ok');
+    }
+    
+    return inner;
+};
+
+outer();
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt=""></figure>
+<p>具体的原因是，js 引擎在解析包含有eval的函数时会保留该函数中的所有可以引用的变量保留在Clousre，因为根本不知道eval会插入什么样的语句，在该语句中会使用什么变量也是不确定的，所以函数中的所有可以引用的变量都会保留，那么在该函数中定义的其他函数也会保留该函数的所有可引用变量，容易造成内存浪费，同时导致内存泄漏的可能性又增大很多。</p>
+<h2 id="let块级作用域产生的闭包">let块级作用域产生的闭包</h2>
+<p>上面说了那么多，总结下闭包的出现条件，及其特点：</p>
+<p>出现条件：在局部作用域中访问了其他局部变量</p>
+<p>特点：</p>
+<ol>
+<li>函数引用的变量会被保留</li>
+<li>同一局部作用域下定义的函数产生的Closure共享</li>
+</ol>
+<p>下面是文章开头代码的Scope情况：</p>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt=""></figure>
+<p>上图中let定义的变量a出现在了getBlockA函数的作用域中，只是这个作用域既不是Local，也不是Closure，而是Block，Block表示的是块级作用域，用let和const定义的变量才会存在块级作用域。这个块级作用域和局部作用域（函数作用域）是没有太大区别的，不同之处在于，块级作用域仅仅约束let和const定义的变量的作用范围，而局部作用域没有这个限制，可以约束所有该作用域定义的变量。</p>
+<p>在这个示例中变量a作为块级作用域的变量，在getBlockA函数的作用域（局部作用域）中被引用了，是符合闭包出现的条件的。</p>
+<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt=""></figure>
+<p>如上图所示，变量变量a被保留了，因为在全局函数getBlockA中被引用了，getBlockA是全局变量，全局变量不会被回收，这也就导致了被其引用的变量a会一直被保存在内存中不会被回收。</p>
+<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt=""></figure>
+<p>如上图所示，getBlockA和getBlockB中的Block保留的变量是相同的，且这两个函数分别只引用了其中一个变量，这说明在块级作用域中定义的函数也会存在闭包的共享。</p>
+<p>所以有let或const定义的变量而产生的块级作用域中定义的函数完全可以认为是闭包。</p>
+<h2 id="js中函数作用域和块级作用域的区别">js中函数作用域和块级作用域的区别</h2>
+<p>函数作用域是局部作用的一种，块级作用域也是局部作用域的一种，这两者的共同点在于，都是通过一对大括号（{}）来定义其作用边界的，其不同点主要在于：</p>
+<ol>
+<li>函数作用域的大括号必须是函数定义的大括号而块级作用域的大括号没有任何限制，只要是一对大括号就可以</li>
+<li>函数作用域中这对大括号的边界作用会对其中定义的所有变量生效，而块级作用域中这对大括号的边界限制仅仅对于let和const定义的变量才会有作用，对于使用var定义的变量没有作用。</li>
+</ol>
+<p>闭包常常被人们用来做模块化，其实有了let和const之后完全可以用一对大括号来模块化，只需将不会对外暴露的变量使用let或const定义，对外暴露的接口使用var来定义，这样就完全可以达到闭包模块化的效果。只是let和const特性在ES标准中出现的同时，也出现了模块化标准，所以用不上就是了。</p>
+<h2 id="结论">结论</h2>
+<p>闭包是一个比较广泛的概念，狭义的理解其为函数中定义的函数是存在局限性的，至少在js中这个定义已经不再适用于闭包，let和const定义的变量产生的块级作用域已经打破了在函数中定义这一点，剩下的一点被定义的函数，如果存在别的形式可以保留对某一作用域的访问，且这种形式可以被当做变量随意传递的话，那么这样狭义的定义会被彻底打破。</p>
+<p>闭包的本质应该是某个作用域链对外暴露了一个访问其内部变量的接口，且这个接口可访问的变量是可以被指定的。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_" class="tag">
+                    ECMAScript
+                  </a>
+                
+                  <a href="https://helloprogh.github.io/sujinqu//tag/jJ_cklWwi" class="tag">
+                    闭包
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之this关键字的绑定">
+                  <h3 class="post-title">
+                    ECMAScript基础之 this 关键字的绑定
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
