@@ -1,102 +1,105 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript基础系列之Object.defineProperty() | 苏进取</title>
-<meta name="description" content="凝视深渊">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649873901">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569649442823">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div id="app" class="main">
-
-      <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
-    <div class="top-header-container">
-      <a class="site-title-container" href="https://helloprogh.github.io/sujinqu/">
-        <img src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649442823" class="site-logo">
-        <h1 class="site-title">苏进取</h1>
-      </a>
-      <div class="menu-btn" @click="menuVisible = !menuVisible">
-        <div class="line"></div>
-      </div>
-    </div>
-    <div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu/">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569649873901" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
       
-        
-          <a href="/" class="site-nav">
-            首页
-          </a>
-        
+        <a href="/" class="menu">
+          首页
+        </a>
       
-        
-          <a href="/archives" class="site-nav">
-            归档
-          </a>
-        
+    
       
-        
-          <a href="/tags" class="site-nav">
-            标签
-          </a>
-        
+        <a href="/archives" class="menu">
+          归档
+        </a>
       
-        
-          <a href="/post/about" class="site-nav">
-            关于
-          </a>
-        
+    
       
-    </div>
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
   </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
-    <div class="social-container">
+  <div class="social-container">
+    
       
-        
+    
       
-        
+    
       
-        
+    
       
-        
+    
       
-        
-      
-    </div>
-    <div class="site-description">
-      凝视深渊
-    </div>
-    <div class="site-footer">
-      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
-    </div>
+    
   </div>
 </div>
 
-
-      <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
-          <div class="post-detail">
-            <h2 class="post-title">JavaScript基础系列之Object.defineProperty()</h2>
-            <div class="post-date">2019-05-31</div>
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript基础系列之Object.defineProperty()
+            </h2>
+            <div class="post-info">
+              <span>
+                2019-05-31
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="post-tag">
+                  # JavaScript
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/IRqR7Jpmy" class="post-tag">
+                  # defineProperty
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/jqZgM-CYX" class="post-tag">
+                  # 属性访问器行为
+                </a>
+              
+            </div>
             
-            <div class="post-content">
-              <h2 id="前言">前言</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">前言</h2>
 <p>Object.defineProperty()是 ES 标准中规定的一个可以定义对象属性特征的一个API，之所以会想起这个 API 是因为在上一篇探究instanceof的细节文章中，想要将右侧函数的Symbol.hasInstance属性重新定义，但是不管怎么定义都没有生效。具体代码如下：</p>
 <pre><code class="language-javascript">var A = function() {};
 var a = new A();
@@ -365,62 +368,111 @@ console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
 <p>value可以定义使用属性访问器获取对象属性时获取到的值，writable 可以定义使用属性访问器设置属性的值是否被允许；get 可以定义使用属性访问器获取对象属性时再做一些额外操作，set 可以定义使用属性访问器给对象属性赋值时进行一些额外的操作，例如 VUE2 中的双向绑定机制的运用。</p>
 <p>其实属性特征值的继承性在获取属性值时的表现与原型继承基本一致，与原型原型继承不同的是在使用 属性访问器给对象属性赋值时，原型对象上某属性的writable为false会被其子对象继承导致子对象无法使用属性访问器对该属性重新赋值，子对象上也无法设置属性；原型上的某属性的set会被其子对象继承，子对象使用属性访问器设置对象的该属性时会调用原型上的set函数来完成赋值操作。最后，当对象原型和其子对象的属性设置都是用Object.defineProperty()来定义时，属性的特征值是不表现继承性的。</p>
 
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E5%85%88%E8%A7%A3%E7%AD%94%E4%B8%8A%E9%9D%A2%E7%9A%84%E9%97%AE%E9%A2%98">先解答上面的问题</a></li>
+<li><a href="#%E5%8F%AF%E4%BD%BF%E7%94%A8%E7%9A%84%E5%B1%9E%E6%80%A7%E7%89%B9%E5%BE%81%E5%80%BC">可使用的属性特征值</a>
+<ul>
+<li><a href="#%E9%80%9A%E7%94%A8%E7%9A%84%E7%89%B9%E5%BE%81%E5%80%BC">通用的特征值</a>
+<ul>
+<li><a href="#configurable">configurable</a></li>
+<li><a href="#enumerable">enumerable</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E6%8F%8F%E8%BF%B0%E7%AC%A6">数据描述符</a>
+<ul>
+<li><a href="#value">value</a></li>
+<li><a href="#writable">writable</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AD%98%E5%8F%96%E6%8F%8F%E8%BF%B0%E7%AC%A6">存取描述符</a>
+<ul>
+<li><a href="#get%E5%92%8Cset%E4%B8%AD%E7%9A%84this">get和set中的this</a></li>
+</ul>
+</li>
+<li><a href="#%E4%B8%8D%E8%83%BD%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8">不能同时使用</a></li>
+</ul>
+</li>
+<li><a href="#%E7%89%B9%E5%BE%81%E5%80%BC%E7%9A%84%E7%BB%A7%E6%89%BF">特征值的继承</a>
+<ul>
+<li><a href="#value%E5%92%8Cwritable%E7%9A%84%E7%BB%A7%E6%89%BF">value和writable的继承</a></li>
+<li><a href="#set%E5%92%8Cget%E7%9A%84%E7%BB%A7%E6%89%BF">set和get的继承</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E8%AE%BA">结论</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
             </div>
-            
-              <div class="tag-container">
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="tag">
-                    JavaScript
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/IRqR7Jpmy" class="tag">
-                    defineProperty
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/jqZgM-CYX" class="tag">
-                    属性访问器行为
-                  </a>
-                
-              </div>
-            
-            
-              <div class="next-post">
-                <div class="next">下一篇</div>
-                <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节">
-                  <h3 class="post-title">
-                    JavaScript基础系列之instanceof细节
-                  </h3>
-                </a>
-              </div>
-            
-
-            
-
-          </div>
-
+          </article>
         </div>
-      </div>
-    </div>
 
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节">
+              <h3 class="post-title">
+                JavaScript基础系列之instanceof细节
+              </h3>
+            </a>
+          </div>
+        
 
-<script type="application/javascript">
+        
 
-AOS.init();
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+</div>
 
-hljs.initHighlightingOnLoad()
+<script>
+  hljs.initHighlightingOnLoad()
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
+
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
 
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>
