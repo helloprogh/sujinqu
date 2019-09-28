@@ -1,102 +1,97 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ECMAScript基础之promise chain | 苏进取</title>
-<meta name="description" content="凝视深渊">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650414676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650315743">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650315743" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <h1 class="site-title">苏进取</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu/">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650414676" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">ECMAScript基础之promise chain</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2019-07-11</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              ECMAScript基础之promise chain
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/LdAcLxUk">
-                    promise
-                    
-                  </a>
-                
+                2019-07-11
               </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/LdAcLxUk" class="post-tag">
+                  # promise
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <h2 id="前言">前言</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">前言</h2>
 <p>最近因为对 promise 的状态依赖理解有偏差，导致在开发过程中花费了3个小时的时间才发现错误。感觉浪费时间了，所以结合标准及实践结果对 promise 的状态依赖做了一个总结。</p>
 <p>问题代码大致是这样的：</p>
 <pre><code class="language-javascript">// 假设promise为请求错误回调
@@ -314,57 +309,95 @@ console.log(promiseThen === promiseValue)
 <h2 id="总结">总结</h2>
 <p>正是因为 promise.then() 返回的是一个新的 Promise 实例，且这个实例可以向后传递上一个依赖 promise 的异步任务的执行状态和其要传递的数据。这样的链式调用机制，解决了存在依赖关系的异步任务只能在回调函数中不断嵌套的最后导致代码难以维护的问题。</p>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#promise-%E7%9A%84%E4%B8%89%E7%A7%8D%E7%8A%B6%E6%80%81">promise 的三种状态</a></li>
+<li><a href="#promisethen-%E8%BF%94%E5%9B%9E%E7%9A%84%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84-promise">promise.then() 返回的是一个新的 promise</a></li>
+<li><a href="#promise-chain">promise chain</a>
+<ul>
+<li><a href="#promisethen-%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E7%9A%84%E4%B8%A4%E7%A7%8D%E8%BF%94%E5%9B%9E%E5%80%BC">promise.then() 回调函数的两种返回值</a></li>
+</ul>
+</li>
+<li><a href="#promisethen-%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E%E5%80%BC%E5%AF%B9-promise-chain-%E7%9A%84%E5%BD%B1%E5%93%8D">promise.then() 回调函数返回值对 promise chain 的影响</a>
+<ul>
+<li><a href="#%E8%A2%AB%E6%89%A7%E8%A1%8C%E7%9A%84%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E%E9%99%A4-promise-%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1%E4%B9%8B%E5%A4%96%E7%9A%84%E4%BB%BB%E4%BD%95%E5%80%BC">被执行的回调函数返回除 Promise 实例对象之外的任何值</a></li>
+<li><a href="#%E8%A2%AB%E6%89%A7%E8%A1%8C%E7%9A%84%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E-promise-%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1">被执行的回调函数返回 Promise 实例对象</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升">
               <h3 class="post-title">
-                下一篇：ECMAScript基础之变量提升
+                ECMAScript基础之变量提升
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">凝视深渊</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
 </div>
 
+<script>
+  hljs.initHighlightingOnLoad()
 
-    </div>
-    <script type="application/javascript">
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-hljs.initHighlightingOnLoad()
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
 
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>

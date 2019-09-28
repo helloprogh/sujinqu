@@ -1,116 +1,105 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript基础系列之IIFE为什么不会污染全局变量 | 苏进取</title>
-<meta name="description" content="凝视深渊">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650414676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650315743">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650315743" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <h1 class="site-title">苏进取</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu/">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650414676" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">JavaScript基础系列之IIFE为什么不会污染全局变量</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2019-05-31</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript基础系列之IIFE为什么不会污染全局变量
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z">
-                    JavaScript
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/TJNLyRvxN">
-                    IIFE
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/ZmA4vJ8UE">
-                    污染全局变量
-                    
-                  </a>
-                
+                2019-05-31
               </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/eWYnrrE4z" class="post-tag">
+                  # JavaScript
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/TJNLyRvxN" class="post-tag">
+                  # IIFE
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/ZmA4vJ8UE" class="post-tag">
+                  # 污染全局变量
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <p>在开发过程中见到的IIFE，函数表达式都是匿名的，如果我们把它写成命名函数表达式，那全局作用域中岂不是多了一个变量，这样又怎么能保证不会污染全局变量呢？</p>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>在开发过程中见到的IIFE，函数表达式都是匿名的，如果我们把它写成命名函数表达式，那全局作用域中岂不是多了一个变量，这样又怎么能保证不会污染全局变量呢？</p>
 <p>通常我们在谈论IIFE时，都是在谈论它的用法，模块化，闭包等等，却少有提及它为什么可以拿来做模块化，为什么不会污染全局变量。</p>
 <p>本文虽然是在说IIFE，但是并不会过多的介绍它的使用，或者其实践意义（毕竟在标准中已经ES6的今天讨论这个意义不是很大），更多的是讨论这种写法的本身在语法上会成立的原因，为什么可以在块级作用域出现之前替代它，及其中涉及到的点。</p>
 <h2 id="阅读判定">阅读判定</h2>
@@ -156,57 +145,88 @@ console.log(c); // c is not defined
 <p>放在篇文章下不合适，但是就是突然想写的话： 记得有一种论调说，前端的发展不过是把其他语言多年前就已经实践过的思想搬过来而已，因此觉得前端没什么技术含量，甚至产生优越感。但是我想说的是，思想并不是某一语言，或者某一领域的所有物。不能因为年轻的事物，正在践行别人实践过的思想就认为它是在抄袭照搬的，毕竟同一个思想的实践在不同的需求下产生的火花是可以完全不同的。也借此表达下前端还是有很多独特而有意思的东西的，这一细分领域的出现不过是时代需求的产物，大家都是为需求服务的，所以没有必要产生所谓优越感或者自卑感，毕竟更好的实现需求才是根本。</p>
 </blockquote>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E9%98%85%E8%AF%BB%E5%88%A4%E5%AE%9A">阅读判定</a></li>
+<li><a href="#iife%E7%9A%84%E6%88%90%E7%AB%8B">IIFE的成立</a></li>
+<li><a href="#%E4%B8%8D%E4%BC%9A%E6%B1%A1%E6%9F%93%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F%E7%9A%84%E5%8E%9F%E5%9B%A0">不会污染全局作用域的原因</a>
+<ul>
+<li><a href="#%E5%91%BD%E5%90%8D%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F">命名函数表达式</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E8%AE%BA">结论</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()">
               <h3 class="post-title">
-                下一篇：JavaScript基础系列之Object.defineProperty()
+                JavaScript基础系列之Object.defineProperty()
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">凝视深渊</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
 </div>
 
+<script>
+  hljs.initHighlightingOnLoad()
 
-    </div>
-    <script type="application/javascript">
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-hljs.initHighlightingOnLoad()
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
 
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>

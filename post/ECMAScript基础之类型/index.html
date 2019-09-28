@@ -1,109 +1,101 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ECMAScript基础之类型 | 苏进取</title>
-<meta name="description" content="凝视深渊">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650414676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650315743">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650315743" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <h1 class="site-title">苏进取</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu/">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650414676" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">ECMAScript基础之类型</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2019-01-27</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              ECMAScript基础之类型
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_">
-                    ECMAScript
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/LJd7ZMRcF">
-                    原始类型
-                    
-                  </a>
-                
+                2019-01-27
               </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_" class="post-tag">
+                  # ECMAScript
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/LJd7ZMRcF" class="post-tag">
+                  # 原始类型
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <h2 id="类型与值">类型与值</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="类型与值">类型与值</h2>
 <p>值的具体的概念，可以理解为是具体的某一个数据值，其表示的是某个具体的数据。true，&quot;&quot;，&quot;test&quot;，1，2等都是一个具体的值。</p>
 <p>类型是一个抽象的概念，本文中类型的定义为数据值的集合。举个例子true，false这两个值组成了Boolean类型；undefined这个值组成了Undefined类型。</p>
 <h2 id="原始类型">原始类型</h2>
@@ -179,57 +171,93 @@ a.b();
 </code></pre>
 <p>考虑下上面代码的运行结果，其出现的原因又是什么？</p>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%80%BC">类型与值</a></li>
+<li><a href="#%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B">原始类型</a>
+<ul>
+<li><a href="#undeifined%E7%B1%BB%E5%9E%8B">Undeifined类型</a></li>
+<li><a href="#null%E7%B1%BB%E5%9E%8B">Null类型</a></li>
+<li><a href="#boolean%E7%B1%BB%E5%9E%8B">Boolean类型</a></li>
+<li><a href="#string%E7%B1%BB%E5%9E%8B">String类型</a></li>
+<li><a href="#number%E7%B1%BB%E5%9E%8B">Number类型</a></li>
+<li><a href="#symbol%E7%B1%BB%E5%9E%8B">Symbol类型</a></li>
+<li><a href="#typeof%E6%93%8D%E4%BD%9C%E7%AC%A6">typeOf操作符</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8E%9F%E5%A7%8B%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%B0%81%E7%AE%B1%E4%B8%8E%E6%8B%86%E7%AE%B1">原始类型的封箱与拆箱</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://helloprogh.github.io/sujinqu//post/crossDomain">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu//post/crossDomain">
               <h3 class="post-title">
-                下一篇：跨域资源共享 CORS笔记
+                跨域资源共享 CORS笔记
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">凝视深渊</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
 </div>
 
+<script>
+  hljs.initHighlightingOnLoad()
 
-    </div>
-    <script type="application/javascript">
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-hljs.initHighlightingOnLoad()
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
 
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>

@@ -1,109 +1,101 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ECMAScript基础之 this 关键字的绑定 | 苏进取</title>
-<meta name="description" content="凝视深渊">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650414676">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu//favicon.ico?v=1569650315743">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu//styles/main.css">
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650315743" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://helloprogh.github.io/sujinqu/">
-        <h1 class="site-title">苏进取</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu/">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu//images/avatar.png?v=1569650414676" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            首页
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            归档
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            标签
-          </a>
-        
-      
-        
-          <a href="/post/about" class="menu purple-link">
-            关于
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">ECMAScript基础之 this 关键字的绑定</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2019-02-22</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              ECMAScript基础之 this 关键字的绑定
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_">
-                    ECMAScript
-                    
-                      ，
-                    
-                  </a>
-                
-                  <a href="https://helloprogh.github.io/sujinqu//tag/ZhcrjCkSa">
-                    this
-                    
-                  </a>
-                
+                2019-02-22
               </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/8ayrj2yM_" class="post-tag">
+                  # ECMAScript
+                </a>
+              
+                <a href="https://helloprogh.github.io/sujinqu//tag/ZhcrjCkSa" class="post-tag">
+                  # this
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <h2 id="前言">前言</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">前言</h2>
 <p>前排声明，这真的是写 this，没有什么太多新的东西，就是一个自己对 this   绑定规则的总结，也许后期水平提高会从更深的角度去解释 JavaScript 中的 this 绑定规则。本文从分别从绑定全局对象和绑定具体对象的角度总结了一下 this 的绑定规则。</p>
 <h2 id="绑定全局对象">绑定全局对象</h2>
 <p>this 绑定全局对象，分为两种情况：</p>
@@ -339,57 +331,97 @@ bArrow();   // {name: &quot;b&quot;}
 <p>以上总结仅仅为粗浅的不同场景下 this 的绑定值的总结，没有从更深的层次（比如ES标准中的定义）去讨论，主要个人<s>时间</s>水平有限，所以大佬请忽略。如有错误欢迎各位指正，不胜感激。</p>
 </blockquote>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E7%BB%91%E5%AE%9A%E5%85%A8%E5%B1%80%E5%AF%B9%E8%B1%A1">绑定全局对象</a>
+<ul>
+<li><a href="#%E7%9B%B4%E6%8E%A5%E5%9C%A8%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8B%E4%BD%BF%E7%94%A8-this">直接在全局作用域下使用 this</a></li>
+<li><a href="#%E8%A2%AB%E8%B0%83%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0%E4%B8%8D%E6%BB%A1%E8%B6%B3%E7%BB%91%E5%AE%9A%E5%85%B7%E4%BD%93%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%BB%91%E5%AE%9A%E8%A7%84%E5%88%99">被调用的函数不满足绑定具体对象的绑定规则</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%91%E5%AE%9A%E5%85%B7%E4%BD%93%E5%AF%B9%E8%B1%A1">绑定具体对象</a>
+<ul>
+<li><a href="#%E5%87%BD%E6%95%B0%E4%BD%9C%E4%B8%BA%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E8%A2%AB%E8%8E%B7%E5%8F%96%E5%B9%B6%E8%B0%83%E7%94%A8">函数作为对象属性被获取并调用</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8-new-%E5%85%B3%E9%94%AE%E5%AD%97%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0">使用 new 关键字调用函数</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8call-applydind-%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0">使用call ，apply，dind 调用函数</a></li>
+<li><a href="#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0">箭头函数</a></li>
+<li><a href="#%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E5%99%A8%E5%92%8C%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%99%A8%E4%B8%AD%E7%9A%84-this">事件监听器和事件处理器中的 this</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E8%AE%BA">结论</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换">
               <h3 class="post-title">
-                下一篇：ECMAScript基础之强制转换
+                ECMAScript基础之强制转换
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">凝视深渊</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu//atom.xml" target="_blank">RSS</a>
 </div>
 
+<script>
+  hljs.initHighlightingOnLoad()
 
-    </div>
-    <script type="application/javascript">
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-hljs.initHighlightingOnLoad()
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
 
 </script>
 
-
-
-
+      </div>
+    </div>
   </body>
 </html>
