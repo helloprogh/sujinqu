@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://helloprogh.github.io/sujinqu/</id>
+    <id>https://helloprogh.github.io/sujinqu</id>
     <title>苏进取</title>
-    <updated>2019-09-28T06:01:02.065Z</updated>
+    <updated>2019-09-28T06:04:59.885Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://helloprogh.github.io/sujinqu/"/>
-    <link rel="self" href="https://helloprogh.github.io/sujinqu//atom.xml"/>
+    <link rel="alternate" href="https://helloprogh.github.io/sujinqu"/>
+    <link rel="self" href="https://helloprogh.github.io/sujinqu/atom.xml"/>
     <subtitle>凝视深渊</subtitle>
-    <logo>https://helloprogh.github.io/sujinqu//images/avatar.png</logo>
-    <icon>https://helloprogh.github.io/sujinqu//favicon.ico</icon>
+    <logo>https://helloprogh.github.io/sujinqu/images/avatar.png</logo>
+    <icon>https://helloprogh.github.io/sujinqu/favicon.ico</icon>
     <rights>All rights reserved 2019, 苏进取</rights>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之promise chain]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之promise chain</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之promise chain">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之promise chain</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之promise chain">
         </link>
         <updated>2019-07-11T13:08:31.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -237,8 +237,8 @@ console.log(promiseThen === promiseValue)
     </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之变量提升]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之变量提升">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之变量提升</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之变量提升">
         </link>
         <updated>2019-06-19T13:08:31.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -377,8 +377,8 @@ test2()
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript基础系列之IIFE为什么不会污染全局变量]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_IIFE</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_IIFE">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript_IIFE</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript_IIFE">
         </link>
         <updated>2019-05-31T14:46:12.000Z</updated>
         <content type="html"><![CDATA[<p>在开发过程中见到的IIFE，函数表达式都是匿名的，如果我们把它写成命名函数表达式，那全局作用域中岂不是多了一个变量，这样又怎么能保证不会污染全局变量呢？</p>
@@ -430,8 +430,8 @@ console.log(c); // c is not defined
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript基础系列之Object.defineProperty()]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_Object.defineProperty()">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript_Object.defineProperty()</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript_Object.defineProperty()">
         </link>
         <updated>2019-05-31T14:46:12.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -706,8 +706,8 @@ console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript基础系列之instanceof细节]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_instanceod细节">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript_instanceod细节</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript_instanceod细节">
         </link>
         <updated>2019-05-19T14:46:12.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -777,8 +777,8 @@ console.log('c instanceof s', c instanceof s);   // true
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript基础系列之原型链]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript_prototype</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript_prototype">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript_prototype</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript_prototype">
         </link>
         <updated>2019-05-08T14:46:12.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -891,8 +891,8 @@ console.log('a的原型是b', Object.getPrototypeOf(c) === b);  //true
     </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之通过let说闭包]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/closureBylet</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/closureBylet">
+        <id>https://helloprogh.github.io/sujinqu/post/closureBylet</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/closureBylet">
         </link>
         <updated>2019-04-20T15:03:38.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -1016,8 +1016,8 @@ outer();
     </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之 this 关键字的绑定]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之this关键字的绑定</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之this关键字的绑定">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之this关键字的绑定</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之this关键字的绑定">
         </link>
         <updated>2019-02-22T13:08:31.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -1259,8 +1259,8 @@ bArrow();   // {name: &quot;b&quot;}
     </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之强制转换]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之强制转换">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之强制转换</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之强制转换">
         </link>
         <updated>2019-02-22T13:08:31.000Z</updated>
         <content type="html"><![CDATA[<h2 id="前言">前言</h2>
@@ -1509,8 +1509,8 @@ false == []; // true
     </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之类型]]></title>
-        <id>https://helloprogh.github.io/sujinqu//post/ECMAScript基础之类型</id>
-        <link href="https://helloprogh.github.io/sujinqu//post/ECMAScript基础之类型">
+        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之类型</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之类型">
         </link>
         <updated>2019-01-27T13:08:31.000Z</updated>
         <content type="html"><![CDATA[<h2 id="类型与值">类型与值</h2>
