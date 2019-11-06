@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://helloprogh.github.io/sujinqu</id>
     <title>苏进取</title>
-    <updated>2019-10-29T14:34:47.596Z</updated>
+    <updated>2019-11-06T14:23:54.281Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://helloprogh.github.io/sujinqu"/>
     <link rel="self" href="https://helloprogh.github.io/sujinqu/atom.xml"/>
@@ -10,6 +10,64 @@
     <logo>https://helloprogh.github.io/sujinqu/images/avatar.png</logo>
     <icon>https://helloprogh.github.io/sujinqu/favicon.ico</icon>
     <rights>All rights reserved 2019, 苏进取</rights>
+    <entry>
+        <title type="html"><![CDATA[一个开源组件 bug 引发的分析]]></title>
+        <id>https://helloprogh.github.io/sujinqu/post/v-clickoutside-zu-jian-que-xian-fen-xi-ji-xiu-fu</id>
+        <link href="https://helloprogh.github.io/sujinqu/post/v-clickoutside-zu-jian-que-xian-fen-xi-ji-xiu-fu">
+        </link>
+        <updated>2019-10-13T13:59:12.000Z</updated>
+        <content type="html"><![CDATA[<p>这是一个悲伤的故事。某日清晨，距离版本转测还剩一天，切图仔的我正按照计划有条不紊的画页面。当我点击一个下拉弹框组件中分页组件页数过多而出现的向后 5 页省略号时，悲剧开始了，弹框被收回了。情景再现<br>
+<img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/bug%26analysis/bug.gif" alt=""></p>
+<h2 id="问题">问题</h2>
+<p>问题的表象很简单，使用的是组件库的下拉弹窗组件，在组件中使用到了分页组件，当点击分页组件的向后 5 页快速跳转时，弹窗被收回了。我们的预期是能够继续操作的，只有点击弹框外部时，弹窗才会被收回。</p>
+<h2 id="分析">分析</h2>
+<p>发现这个问题我做了如下分析：</p>
+<ol>
+<li>
+<p>确定这是一个问题<br>
+再次重复操作问题，确定问题出现的条件，能够在特定条件下复现的问题才是问题。我稳定的复现了问题条件是：分页组件出现向前跳转 5 页或向后跳转 5 页，点击到不会再出现向前跳转 5 页或向后跳转 5 页这样的快速跳转后，弹框会被收回。</p>
+</li>
+<li>
+<p>确定是自己组件配置使用问题还是组件本身 bug<br>
+我在组件的文档中并没有看到有关这个问题的特别说明。接着我又在官方提供的代码运行环境中，写了一个使用的 demo（实际项目中的代码复杂度较高，可能存在被其他样式等因素影响而产生问题，使用功能单一的 demo 有助于我们快速确定问题范围，且官方运行环境一般使用的是其最新的组件版本），发现与我在项目中使用存在同样问题。到这里可以排除是组件配置使用，组件库版本不是最新，及项目环境影响导致的问题。</p>
+</li>
+<li>
+<p>在组件库的开源项目中查询 issue<br>
+在 issue 中搜索关键字查询是否有相关 issue，如果运气好找到相关问题，一般会有相关的讨论，就算没有具体的解决措施也能让你明白问题大概在哪里。我运气比较差，没有找到相关问题的 issue，所以只能自己提一个 issue 了。有时间有耐心等待维护人解决你提的 issue，问题分析到这里就可以结束了。</p>
+</li>
+<li>
+<p>查看组件源码<br>
+显然我的时间很紧急，问题必须尽快解决，且我也想确定一下问题具体在哪里，看自己能否解决。很快我找到的相关组件的源码，经过定位发现，弹框下拉组件中使用了 v-click-outside 指令，用来触发点击指令之外的元素收起弹框。<br>
+进一步深入源码，发现 v-click-outside 组件的原理，是在 document 组件上注册了一个 click 监听事件，当有点击事件发生，监听函数会判断，点击事件发生的元素，是否包含在使用指令的元素中。如果是监听函数返回，否则触发指令绑定的事件（在弹框组件中就是隐藏弹框）。代码片段如下</p>
+</li>
+</ol>
+<pre><code class="language-javascript">// el 表示指令绑定的元素，event为点击事件
+const isClickOutside = event.target !== el &amp;&amp; !el.contains(event.target)
+
+if (!isClickOutside) {
+    return
+}
+
+if (middleware(event, el)) {
+    handler(event, el)
+}
+</code></pre>
+<ol start="6">
+<li>断点调试<br>
+经过上面的步骤过后，我还没有发现问题的所在，所以只能打断点进行代码调试了。经过调试发现问题出在 el.contains(event.target) 这一段，分页组件中的向前 5 页元素，点击触发后就被 v-if 指令从页面中移除了。所以运行到这一句时，el 中是不包含向前 5 页元素的。也就是说这里向前 5 页元素被错误的判断为不在 el 元素中，指令绑定的弹框收起函数被触发，弹框被收回了。</li>
+</ol>
+<h2 id="解决问题">解决问题</h2>
+<p>问题已经找出，现在问题是怎么解决，因为问题是出在组件中，但是我们又不能直接修改组件库代码，直接修改项目依赖代码，不利于代码维护，也治标不治本。最好是能在项目代码中添加代码解决这个问题。</p>
+<p>开始时走了一些弯路，想着用伪元素去覆盖，被点击的元素，试图去混淆 e.target，让 el.contains(event.target) 为true。这样确实取得了一些成效，但是在页数更多了以后依然有问题，而且我也不是很清楚这样用伪元素遮挡可以让事件触发元素不是本来元素的原理是什么。更重要的一点是，写这篇文章的时候我完全回忆不出当时我为什么会想到这个方案，可能是灵感吧，解决问题真的很需要灵感。</p>
+<p>在使用了弯路解决办法暂时解决问题后，我开始思考更彻底的解决方案。归根结底问题是出在了 v-click-outside 指令上，如果我够找到一种正确的判断方式，让被删除的元素也可以被判断为在指令注册元素中，那么问题将得到彻底解决。经过不断的尝试与思考，我发现将点击事件注册在捕获阶段触发时，得到的指令绑定元素中依然有应该被删除的点击元素。到这里问题基本就明朗了，彻底的解决方案也就出现了。</p>
+<p>由于组件引入的 v-click-outside 指令是局部注册在下拉弹框组件上的，所以我使用了 vue 的extends 继承了组件的弹框下拉组件。在继承的组件中重新注册了指令 v-click-outside，该指令注册在 document 上的点击事件是捕获阶段触发的。</p>
+<p>由于是继承覆盖组件库中的组件，所以组件库升级不会带来太大的影响，同时也不用重新写一个组件，减少了工作量。到这里问题就得到了彻底的解决。</p>
+<h2 id="输出-v-click-out-包">输出 v-click-out 包</h2>
+<p>解决完问题之后，我在 npm 上搜索了一些 click-outside 相关的包，发现这些包中注册在 document 上的点击事件，普遍是在冒泡阶段触发的，也就是说都存在文中我所遇到的问题。于是经过几天业余时间的努力，我开源了一个基于 vue 的 click-outside 指令开源项目<a href="https://github.com/helloprogh/catch-click-outside">catch-click-outside</a>（不要脸求star）</p>
+<h2 id="一点思考">一点思考</h2>
+<p>在之前的工作中，我也解决了不少问题，这次之所以会记录解决过程，一个是因为这个问题我产生了一些输出，可能对别人会有些微的帮助。另一个比较重要的原因是，在解决问题过程中走了一些弯路，也遇到了一些坎，但是这些问题都在不停的思考与事件中逐渐清晰，然后被解决，我觉得这个过程很值得记录。文字功底有限，这个解决过程记录的平淡无奇，谨以此作为备忘。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[ECMAScript基础之promise chain]]></title>
         <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之promise chain</id>
@@ -1505,89 +1563,6 @@ false == []; // true
 </ol>
 <h2 id="结论">结论</h2>
 <p>其实上面描述了这么多，日常开发环境中用到比较多的应该是作为判断条件，+，==这三种情况了，这三种中最常见的应该是判断条件的情况了，这种情况反而是最简单的一种了。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[ECMAScript基础之类型]]></title>
-        <id>https://helloprogh.github.io/sujinqu/post/ECMAScript基础之类型</id>
-        <link href="https://helloprogh.github.io/sujinqu/post/ECMAScript基础之类型">
-        </link>
-        <updated>2019-01-27T13:08:31.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="类型与值">类型与值</h2>
-<p>值的具体的概念，可以理解为是具体的某一个数据值，其表示的是某个具体的数据。true，&quot;&quot;，&quot;test&quot;，1，2等都是一个具体的值。</p>
-<p>类型是一个抽象的概念，本文中类型的定义为数据值的集合。举个例子true，false这两个值组成了Boolean类型；undefined这个值组成了Undefined类型。</p>
-<h2 id="原始类型">原始类型</h2>
-<p>ES中变量是没有类型的，只有值有类型，所以接下来我们讨论的均是与值相关的问题，和变量没有什么关系。在ES规范中规定了六种原始值，其分别为：</p>
-<ul>
-<li>Undefined</li>
-<li>Null</li>
-<li>Boolean</li>
-<li>Number</li>
-<li>Symbol -- 在ES6中被加入</li>
-<li>String</li>
-</ul>
-<p>ES中对这六种类型的定义分别为</p>
-<h3 id="undeifined类型">Undeifined类型</h3>
-<p>值只有undefined值的类型，undefined值是在代码中直接书写undefined这几个字母，不带引号的(&quot;undefined&quot;)的一个值。</p>
-<pre><code class="language-javascript">console.log(undefined in window); // true
-</code></pre>
-<p>undefined不是保留字，在浏览器的中是一个全局变量，这意味着undefined存在被重新赋值的可能性。这种可能性针对的是老旧的浏览器，由于这一原因我们会在某些库的源码中看到使用void 0来代替undefined，实现了ES5相关标准的浏览器undefined不会被重重新赋值。</p>
-<h3 id="null类型">Null类型</h3>
-<p>值只有null值的类型，null值也是直接书写在代码中的这几个字母组成的值。</p>
-<h3 id="boolean类型">Boolean类型</h3>
-<p>由原始值true和false组成的类型，如果某个值是Boolean类型，那个它一定是true或者false，不存在其他的可能。</p>
-<h3 id="string类型">String类型</h3>
-<p>由零个或多个16位无符号整数组成的有限有序序列原始值的集合</p>
-<h3 id="number类型">Number类型</h3>
-<p>所有可能的IEEE 754-2008 格式的 64 位双精度二进制的原始值的集合，NAN值，正无穷，负无穷</p>
-<h3 id="symbol类型">Symbol类型</h3>
-<p>表示一个唯一的，非字符串的属性键对象的原始值，其集合。</p>
-<h3 id="typeof操作符">typeOf操作符</h3>
-<p>上述原始类型中五种可以使用typyof操作符准确识判断</p>
-<pre><code class="language-javascript">console.log(typeof undefined === &quot;undefined&quot;); // true
-console.log(typeof true === &quot;boolean&quot;); // true
-console.log(typeof 42 === &quot;number&quot;); // true
-console.log(typeof &quot;42&quot; === &quot;string&quot;); // true
-console.log(typeof Symbol() === &quot;symbol&quot;); // true
-</code></pre>
-<p>typeof操作符可能返回的值有七种除了上面列出的五种还有&quot;object&quot;和&quot;function&quot;，也就是说typeof操作符的返回值与原始类型不是一一对应的。</p>
-<pre><code class="language-javascript">console.log(typeof null === &quot;object&quot;);
-console.log(typeof function() {} === &quot;function&quot;);
-</code></pre>
-<blockquote>
-<p>以上代码在线示例https://jsbin.com/voroxam/3/edit?js,console</p>
-</blockquote>
-<p>null值返回&quot;object&quot;其实是一处设计错误，而且在ES设计之初就一直存在，有太多的生产代码依赖这一特性，所以在后继的标准中也无法修复这个错误。</p>
-<blockquote>
-<p>在 JavaScript 最初的实现中，JavaScript 中的值是由一个表示类型的标签和实际数据值表示的。对象的类型标签是 0。由于 null 代表的是空指针（大多数平台下值为 0x00），因此，null的类型标签也成为了 0，typeof null就错误的返回了&quot;object&quot;。</p>
-</blockquote>
-<h2 id="原始类型的封箱与拆箱">原始类型的封箱与拆箱</h2>
-<p>原始类型除了undefined和null外均有其对应的对象，原始类型与其对象在代码实际上常常会相互转换的。考虑如下代码：</p>
-<pre><code class="language-javascript">var a = &quot;test&quot;;
-var b = &quot;testb&quot;
-var c = a.concat(b);
-var d = a + b;
-</code></pre>
-<p>上述代码中c和d得到的是一样的结果，但是结果产生的方式却有所不同，得到c的过程将a在当前运算中转换为String实例，使其可调用String实例对象原型上的concat函数，而在得到d的过程是直接使用运算符+得到结果。</p>
-<p>也就是说一个原始类型在代码中被当做对象的方式去调用的一些方法时，该原始类型会被包装成其对应的类型一个实例对象，该实例对象在需要被封箱的操作完成后就会被回收，从代码中我们无法获取也无需获取这个被包装的实例对象。</p>
-<p>关于拆箱出现的场景，考虑如下代码：</p>
-<pre><code class="language-javascript">var a = new String(&quot;test&quot;);
-var b = new String(&quot;testb&quot;);
-var c = a + b;
-conosle.log(c);
-var d = {name: &quot;test&quot;};
-var e = {name: &quot;teste&quot;};
-var f = d + e;
-console.log(f);
-</code></pre>
-<p>在运行这段代码之前可以先考虑一个问题，对象和对象可以进行+运算么？</p>
-<p>上述a+b和d+e均是两个对象的运算，此处将+两个的值强制转为原始类型字符串后进行的运算，至于此处是如何强制转换的，其转换的规则又是如何，可参考ES标准中的ToPrimitive算法。</p>
-<p>这段封箱与拆箱操作只是有助于理解js代码的运行，实际应用意义不大，之所以记录这个问题是有人遇到过如下代码：</p>
-<pre><code class="language-javascript">var a = 1;
-a.b= function() {};
-a.b();
-</code></pre>
-<p>考虑下上面代码的运行结果，其出现的原因又是什么？</p>
 ]]></content>
     </entry>
 </feed>
