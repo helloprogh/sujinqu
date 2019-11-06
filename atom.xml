@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://helloprogh.github.io/sujinqu</id>
     <title>苏进取</title>
-    <updated>2019-11-06T14:23:54.281Z</updated>
+    <updated>2019-11-06T14:37:09.932Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://helloprogh.github.io/sujinqu"/>
     <link rel="self" href="https://helloprogh.github.io/sujinqu/atom.xml"/>
@@ -41,16 +41,16 @@
 进一步深入源码，发现 v-click-outside 组件的原理，是在 document 组件上注册了一个 click 监听事件，当有点击事件发生，监听函数会判断，点击事件发生的元素，是否包含在使用指令的元素中。如果是监听函数返回，否则触发指令绑定的事件（在弹框组件中就是隐藏弹框）。代码片段如下</p>
 </li>
 </ol>
-<pre><code class="language-javascript">// el 表示指令绑定的元素，event为点击事件
-const isClickOutside = event.target !== el &amp;&amp; !el.contains(event.target)
+<pre><code class="language-javascript">    // el 表示指令绑定的元素，event为点击事件
+    const isClickOutside = event.target !== el &amp;&amp; !el.contains(event.target)
 
-if (!isClickOutside) {
-    return
-}
+    if (!isClickOutside) {
+        return
+    }
 
-if (middleware(event, el)) {
-    handler(event, el)
-}
+    if (middleware(event, el)) {
+        handler(event, el)
+    }
 </code></pre>
 <ol start="6">
 <li>断点调试<br>

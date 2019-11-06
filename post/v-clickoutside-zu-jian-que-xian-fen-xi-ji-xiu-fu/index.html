@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>一个开源组件 bug 引发的分析 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1573050149243">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1573051024961">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1573050149243" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1573051024961" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -129,16 +129,16 @@
 进一步深入源码，发现 v-click-outside 组件的原理，是在 document 组件上注册了一个 click 监听事件，当有点击事件发生，监听函数会判断，点击事件发生的元素，是否包含在使用指令的元素中。如果是监听函数返回，否则触发指令绑定的事件（在弹框组件中就是隐藏弹框）。代码片段如下</p>
 </li>
 </ol>
-<pre><code class="language-javascript">// el 表示指令绑定的元素，event为点击事件
-const isClickOutside = event.target !== el &amp;&amp; !el.contains(event.target)
+<pre><code class="language-javascript">    // el 表示指令绑定的元素，event为点击事件
+    const isClickOutside = event.target !== el &amp;&amp; !el.contains(event.target)
 
-if (!isClickOutside) {
-    return
-}
+    if (!isClickOutside) {
+        return
+    }
 
-if (middleware(event, el)) {
-    handler(event, el)
-}
+    if (middleware(event, el)) {
+        handler(event, el)
+    }
 </code></pre>
 <ol start="6">
 <li>断点调试<br>
