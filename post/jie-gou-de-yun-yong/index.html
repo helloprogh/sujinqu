@@ -1,0 +1,275 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ES6之解构 | 苏进取</title>
+<meta name="description" content="凝视深渊" />
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149251797-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-149251797-1');
+</script>
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://helloprogh.github.io/sujinqu">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  </a>
+  <h1 class="site-title">
+    苏进取
+  </h1>
+  <p class="site-description">
+    凝视深渊
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://helloprogh.github.io/sujinqu/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://helloprogh.github.io/sujinqu/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://helloprogh.github.io/sujinqu/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://helloprogh.github.io/sujinqu/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              ES6之解构
+            </h2>
+            <div class="post-info">
+              <span>
+                2019-11-10
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>解构是ES6中最具表现力的特性之一。因其表现力，且极简单，这一特性也是在生产实践中运用最为广泛的特性之一。它可以将对象的属性值以特定的形式赋值给变量。除了对象，解构也可用于数组及函数参数列表。</p>
+<h2 id="对象解构">对象解构</h2>
+<p>假设一个 cat 对象，具有一些属性，用代码描述如下。</p>
+<pre><code class="language-javascript">let cat = {
+    name: 'tom',
+    color: 'gray',
+    hobbies: {
+        drinks: 'milk',
+        foods: 'cheese'
+    }
+}
+</code></pre>
+<h3 id="常规操作">常规操作</h3>
+<p>现在我们要获得 cat 的 name 属性并赋值给一个 name 变量，使用解构我们可以这么做</p>
+<pre><code class="language-javascript">let { name } = cat;
+</code></pre>
+<p>这样我们就获得了一个 name 变量，且其值为 cat.name 的值 'tom'。这种写法等同于 ES5 代码</p>
+<pre><code class="language-javascript">let name = cat.name
+</code></pre>
+<p>使用解构让我们避免重复写两次 name，且当你适应了解构的写法后，这种简明的写法会使代码更清晰，更符合直觉。ES5 语法使用逗号分隔可以声明多个变量，解构也同样能够做到。</p>
+<pre><code class="language-javascript">let {name, color} = cat;
+</code></pre>
+<p>需求发生了变化，我想要定义一个 catName 变量且其值为 cat 的 name 属性，解构依然可以做到</p>
+<pre><code class="language-javascript">let {name: catName} = cat;
+</code></pre>
+<p>这种写法使用了解构的别名语法。这种写法没有让代码变得更简单 (<code>let catName = cat.name</code>)。但解构支持深度解构，这就很有用了，考虑下面这段代码。</p>
+<pre><code class="language-javascript">let {hobbies: {foods, drinks}} = cat;
+</code></pre>
+<p>当需要获取对象的某个嵌套较深的属性值时，使用别名能够清晰的表达所有解构的属性名。同时能够清晰的表达了取值对象的嵌套解构，这一点充分展现了解构的表现力。</p>
+<p>解构并不是万能的，对象没有的属性，同 ES5 一样会给变量赋值 undefined。当解构嵌套层级更深的属性时，属性的父对象时 null 或 undefined 也会抛出异常。这与 ES5 中访问 undefined 的属性值表现时一致的。在最后的解构与默认值章节中将介绍如何使用默认值来避免这种问题。</p>
+<h2 id="数组解构">数组解构</h2>
+<p>数组的解构语法和对象解构类似。不同的是数组使用的是方括号。数组解构可以在不显示引用索引的情况下清晰的为数组中的值命名。下面是数组解构的示例。</p>
+<pre><code class="language-javascript">let scoreArr = [100, 99, 98, 97];
+let [first, second] = scoreArr;
+</code></pre>
+<p>解构数组时可以跳过不需要引用的值。</p>
+<pre><code class="language-javascript">let scoreArr = [100, 99, 98, 97];
+let [first, , third] = scoreArr;
+</code></pre>
+<p>当交换两个变量的值时，借助数组解构可以在不产生第三个变量的情况下完成值的交换。而且这种表达更为简短且清晰，这再一次展现了解构的表现力。</p>
+<pre><code class="language-javascript">let left = 9;
+let right = 10;
+[left, right] = [right, left];
+</code></pre>
+<p>如果数组中的元素是对象时，我们可以组合使用对象解构和数组解构来完成赋值。</p>
+<pre><code class="language-javascript">let catArr = [
+    {
+        name: 'tom'
+    },
+    {
+        name: 'jimi'
+    }
+]
+let [{name: tom}, {name: jimi}] = catArr;
+console.log(tom, jimi);
+</code></pre>
+<p>既然数组与对象的解构嵌套是可以的，那么数组与数组同样是可以的。</p>
+<h2 id="函数参数解构">函数参数解构</h2>
+<p>函数参数的解构是对象解构和数组解构的一种运用之一。本质上来说，函数参数解构并不能算作一种解构。</p>
+<pre><code class="language-javascript">let cat = {
+    name: 'tom'
+}
+
+function printCatName({ name }) {
+    console.log(name);
+}
+</code></pre>
+<p>上面的代码只是简单的表示了函数参数解构的样子，实践中的函数参数解构是和默认值组合在一起使用的，下面我们就来看下解构与默认值结合使用。</p>
+<h2 id="解构与变量的默认值">解构与变量的默认值</h2>
+<p>在前面的小节中，有提到，在使用解构嵌套时，如果遇到赋值的对象中没有该属性，那么会导致赋值报错。由于浏览器单线程，所以 js 发生错误时会导致整个页面的代码的继续运行，这是我们在实际编码过程中需要尽量避免一些基础错误。</p>
+<p>使用默认值可以很好的解决，解构嵌套时可能会产生的赋值错误。</p>
+<pre><code class="language-javascript">let cat = {
+    name: 'tom',
+    color: 'gray',
+}
+
+let {hobbies: {foods, drinks} = {}} = cat;
+</code></pre>
+<p>如上代码给 hobbies 属性指定了默认值 {}, 可以避免赋值 foods 变量和 drinks 变量时产生的错误。</p>
+<pre><code class="language-!">示例中只是举例避免报错的默认值写法，实践中默认值空对象可以写成一个有 foods，drinks 属性值的对象。
+</code></pre>
+<p>当然作为解构运用的一种，函数参数解构时同样可以运用默认值，这在实践中更常用。考虑如下问题，表格数据获取函数，需要根据分页器指定的条数，及页数获取数据。</p>
+<pre><code class="language-javascript">function getData({page = 1, size = 10}) {
+    ....
+    return data;
+}
+</code></pre>
+<p>使用函数参数解构就可以，不用再重新定义默认值，如果没传参数时函数参数会有默认值。不需要我们再去花费额外的代码去处理函数的默认值。</p>
+<h2 id="结论">结论</h2>
+<p>本文只是讲了一个解构的基本语法，在编码实践中，解构和默认值一起使用会在更多场景发挥作用。推荐使用它的理由是，其语法的简洁和其强大的层次结构表达能力。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%AF%B9%E8%B1%A1%E8%A7%A3%E6%9E%84">对象解构</a>
+<ul>
+<li><a href="#%E5%B8%B8%E8%A7%84%E6%93%8D%E4%BD%9C">常规操作</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E7%BB%84%E8%A7%A3%E6%9E%84">数组解构</a></li>
+<li><a href="#%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E8%A7%A3%E6%9E%84">函数参数解构</a></li>
+<li><a href="#%E8%A7%A3%E6%9E%84%E4%B8%8E%E5%8F%98%E9%87%8F%E7%9A%84%E9%BB%98%E8%AE%A4%E5%80%BC">解构与变量的默认值</a></li>
+<li><a href="#%E7%BB%93%E8%AE%BA">结论</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://helloprogh.github.io/sujinqu/post/v-clickoutside-zu-jian-que-xian-fen-xi-ji-xiu-fu">
+              <h3 class="post-title">
+                一个开源组件 bug 引发的分析
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | 
+  <a class="rss" href="https://helloprogh.github.io/sujinqu/atom.xml" target="_blank">RSS</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+
+  let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+  // This should probably be throttled.
+  // Especially because it triggers during smooth scrolling.
+  // https://lodash.com/docs/4.17.10#throttle
+  // You could do like...
+  // window.addEventListener("scroll", () => {
+  //    _.throttle(doThatStuff, 100);
+  // });
+  // Only not doing it here to keep this Pen dependency-free.
+
+  window.addEventListener("scroll", event => {
+    let fromTop = window.scrollY;
+
+    mainNavLinks.forEach((link, index) => {
+      let section = document.getElementById(decodeURI(link.hash).substring(1));
+      let nextSection = null
+      if (mainNavLinks[index + 1]) {
+        nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+      }
+      if (section.offsetTop <= fromTop) {
+        if (nextSection) {
+          if (nextSection.offsetTop > fromTop) {
+            link.classList.add("current");
+          } else {
+            link.classList.remove("current");    
+          }
+        } else {
+          link.classList.add("current");
+        }
+      } else {
+        link.classList.remove("current");
+      }
+    });
+  });
+
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
