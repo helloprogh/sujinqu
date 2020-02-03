@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ECMAScript基础之通过let说闭包 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -140,7 +140,7 @@
 outer();
 </code></pre>
 <p>上面的代码是否产生了闭包呢？我们来看下调试工具中是怎么体现的</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt="" loading="lazy"></figure>
 <p>如上图可见在outer函数的结尾大括号处打上断点，可以查看outer函数的作用域（结尾处打断点可以更准确的获得所用变量的值），上图中标识outer处的scope表示的就是断点处所在作用域的变量，Locale就是outer函数作用域中定义的变量集合，Global表示的可访问的全局变量集合。</p>
 <p>outer的Scope中的locale里面可以看到变量outerVar，inner，其中outerVar的值是字符串outer，inner的值是一个函数。</p>
 <p>展开inner函数可以看到该函数的[[Scopes]]，这里没由Local类型的变量，但是有一个Closure，这里没有Locale的原因是inner函数并没有定义变量，而是引用了其父作用域outer函数作用域中的outerVal变量，我们可以在Closure中看到outerVal，这个Closure就是表示的该函数引用的其他局部作用域的变量集合，当一个函数的[[Scopes]]中出现Closure就表示这个函数及其所引用的其他局部作用域变量共同形成了一个闭包。</p>
@@ -171,7 +171,7 @@ for(var i=0; i&lt;10000; i++) {
 <p>这段代码中是存在问题的，下面说下具体什么问题。</p>
 <h3 id="共享闭包">共享闭包</h3>
 <p>上面的代码中存在内存泄漏问题，下面通过调试工具看下这段代码的情况：</p>
-<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt=""></figure>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt="" loading="lazy"></figure>
 <p>通过上图可见consoleOuterVal和inner函数的[[Scopes]]中均出现了Closure，且其保存的变量均为outerVal，inner中没用引用outerVal变量，怎么会该变量会出现在其Closure中呢？这实际上是在得到函数Closure中的变量时，JS引擎会把作用域下的所有闭包变量放在一起，在该作用域下定义的函数都会得到一个相同的Closure。这样的话上面的inner也会拥有和consoleOuterVal函数一样变量引用，且该变量一直无法释放，随着循环的增加，内存自然就不够用了。</p>
 <p>关于共享闭包的 更多细节探讨可访问<a href="https://juejin.im/post/5c723d90f265da2dc0065bdb">前端小秘密系列之闭包</a>（非本人，这里不要脸的引用下）。</p>
 <h3 id="不建议使用eval的原因">不建议使用eval的原因</h3>
@@ -192,7 +192,7 @@ for(var i=0; i&lt;10000; i++) {
 
 outer();
 </code></pre>
-<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt=""></figure>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt="" loading="lazy"></figure>
 <p>具体的原因是，js 引擎在解析包含有eval的函数时会保留该函数中的所有可以引用的变量保留在Clousre，因为根本不知道eval会插入什么样的语句，在该语句中会使用什么变量也是不确定的，所以函数中的所有可以引用的变量都会保留，那么在该函数中定义的其他函数也会保留该函数的所有可引用变量，容易造成内存浪费，同时导致内存泄漏的可能性又增大很多。</p>
 <h2 id="let块级作用域产生的闭包">let块级作用域产生的闭包</h2>
 <p>上面说了那么多，总结下闭包的出现条件，及其特点：</p>
@@ -203,12 +203,12 @@ outer();
 <li>同一局部作用域下定义的函数产生的Closure共享</li>
 </ol>
 <p>下面是文章开头代码的Scope情况：</p>
-<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt=""></figure>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt="" loading="lazy"></figure>
 <p>上图中let定义的变量a出现在了getBlockA函数的作用域中，只是这个作用域既不是Local，也不是Closure，而是Block，Block表示的是块级作用域，用let和const定义的变量才会存在块级作用域。这个块级作用域和局部作用域（函数作用域）是没有太大区别的，不同之处在于，块级作用域仅仅约束let和const定义的变量的作用范围，而局部作用域没有这个限制，可以约束所有该作用域定义的变量。</p>
 <p>在这个示例中变量a作为块级作用域的变量，在getBlockA函数的作用域（局部作用域）中被引用了，是符合闭包出现的条件的。</p>
-<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt=""></figure>
+<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt="" loading="lazy"></figure>
 <p>如上图所示，变量变量a被保留了，因为在全局函数getBlockA中被引用了，getBlockA是全局变量，全局变量不会被回收，这也就导致了被其引用的变量a会一直被保存在内存中不会被回收。</p>
-<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt=""></figure>
+<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt="" loading="lazy"></figure>
 <p>如上图所示，getBlockA和getBlockB中的Block保留的变量是相同的，且这两个函数分别只引用了其中一个变量，这说明在块级作用域中定义的函数也会存在闭包的共享。</p>
 <p>所以有let或const定义的变量而产生的块级作用域中定义的函数完全可以认为是闭包。</p>
 <h2 id="js中函数作用域和块级作用域的区别">js中函数作用域和块级作用域的区别</h2>

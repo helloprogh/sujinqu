@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>跨域资源共享 CORS笔记 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -192,7 +192,7 @@
 <p>不满足上面全部条件的请求称为预检请求，需要先使用OPTIONS方法发起一个预检请求到服务器，以获知服务器是否允许该实际请求。</p>
 <h4 id="简单请求过程">简单请求过程</h4>
 <p>假设请求站点为http://example.com，想要访问http://test.com的资源</p>
-<figure data-type="image" tabindex="1"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_simple.png" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_simple.png" alt="" loading="lazy"></figure>
 <p>分析请求报文和响应报文如下：</p>
 <p>``</p>
 <pre><code class="language-shell">GET /resource/ HTTP/1.1
@@ -225,7 +225,7 @@ Content-Type: application/xml
 <p>一个最基本的CORS请求由两部分构成，请求首部指定Origin来表明自己的身份，服务端响应首部指定Access-Control-Allow-Origin字段来告诉浏览器自己允许什么站点访问自己的资源，浏览器会根据这两部分信息来判断该请求的响应是否应该放行。如果响应首部中未返回Access-Control-Allow-Origin，或者请求站点在该字段指定的允许访问范围之内。浏览器会抛出错误。更多跨域相关字段可参考https://fetch.spec.whatwg.org/#http-access-control-allow-origin</p>
 <h4 id="预检请求过程">预检请求过程</h4>
 <p>预检请求要求必须首先是用OPTIONS方法发起一个预检请求到服五器，以获知服务器是否允许该实际请求，预检请求可以避免跨域请求对服务器的用户数据产生未预期的影响。</p>
-<figure data-type="image" tabindex="2"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_not_simple.png" alt=""></figure>
+<figure data-type="image" tabindex="2"><img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/cors_not_simple.png" alt="" loading="lazy"></figure>
 <p>非简单请求的过程上图所示，各个字段在请求中的作用具体如下：</p>
 <ul>
 <li>

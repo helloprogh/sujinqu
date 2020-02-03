@@ -2,14 +2,14 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://helloprogh.github.io/sujinqu</id>
     <title>苏进取</title>
-    <updated>2019-12-08T14:23:42.453Z</updated>
+    <updated>2020-02-03T10:47:16.583Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://helloprogh.github.io/sujinqu"/>
     <link rel="self" href="https://helloprogh.github.io/sujinqu/atom.xml"/>
     <subtitle>凝视深渊</subtitle>
     <logo>https://helloprogh.github.io/sujinqu/images/avatar.png</logo>
     <icon>https://helloprogh.github.io/sujinqu/favicon.ico</icon>
-    <rights>All rights reserved 2019, 苏进取</rights>
+    <rights>All rights reserved 2020, 苏进取</rights>
     <entry>
         <title type="html"><![CDATA[ES6之解构]]></title>
         <id>https://helloprogh.github.io/sujinqu/post/jie-gou-de-yun-yong</id>
@@ -115,7 +115,7 @@ let {hobbies: {foods, drinks} = {}} = cat;
         </link>
         <updated>2019-10-13T13:59:12.000Z</updated>
         <content type="html"><![CDATA[<p>这是一个悲伤的故事。某日清晨，距离版本转测还剩一天，切图仔的我正按照计划有条不紊的画页面。当我点击一个下拉弹框组件中分页组件页数过多而出现的向后 5 页省略号时，悲剧开始了，弹框被收回了。情景再现<br>
-<img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/bug%26analysis/bug.gif" alt=""></p>
+<img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/bug%26analysis/bug.gif" alt="" loading="lazy"></p>
 <h2 id="问题">问题</h2>
 <p>问题的表象很简单，使用的是组件库的下拉弹窗组件，在组件中使用到了分页组件，当点击分页组件的向后 5 页快速跳转时，弹窗被收回了。我们的预期是能够继续操作的，只有点击弹框外部时，弹窗才会被收回。</p>
 <h2 id="分析">分析</h2>
@@ -217,7 +217,7 @@ console.log(promise === thenPromise);
 console.log(thenPromise);
 </code></pre>
 <p>运行结果如下：<br>
-<img src="https://user-gold-cdn.xitu.io/2019/7/9/16bd7432c2c0501f?w=329&amp;h=211&amp;f=png&amp;s=16376" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/7/9/16bd7432c2c0501f?w=329&amp;h=211&amp;f=png&amp;s=16376" alt="" loading="lazy"></p>
 <p>从运行结果中我们不难得出两点：</p>
 <ol>
 <li>promise.then() 返回的 promise 和调用 .then() 的 promise 不是同一个</li>
@@ -303,9 +303,9 @@ promise1.then(()=&gt;{
 // promise1 resolved1
 // undefined
 </code></pre>
-<p><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be146e8e640d74?w=523&amp;h=126&amp;f=png&amp;s=5874" alt=""><br>
+<p><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be146e8e640d74?w=523&amp;h=126&amp;f=png&amp;s=5874" alt="" loading="lazy"><br>
 运行结果如上，为了方便阅读结果，我们把打印顺序调换一下，整理如下</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be14970be44383?w=354&amp;h=117&amp;f=png&amp;s=4668" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/7/11/16be14970be44383?w=354&amp;h=117&amp;f=png&amp;s=4668" alt="" loading="lazy"></figure>
 <p>promise 注册的回调运行了成功回调，而后返回了一个成功状态的promise，这个返回的 promise 注册的回调运行了成功回调，回调函数的实参是 undefined；promise1 注册的回调运行了失败回调，而后同样返回了一个成功状态的 promise ，这个返回的 promise 注册的回调运行了成功回调，回调函数的实参是 undefined</p>
 <blockquote>
 <p>js 函数执行后默认返回值为undefined</p>
@@ -477,7 +477,7 @@ test();
 test();
 </code></pre>
 <p>嗯，这段代码会抛错，就像这样<br>
-<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt="" loading="lazy"></p>
 <p>现在去网上搜一下关于 let 的变量提升的内容，仍然会看到很多说 let 不存在变量声明提升的说法，给出的理由是，既然提升了，为什么在声明之前使用该变量会报错呢？下面就说一说为什么认为 let 是存在提升的。 考虑下面代码：</p>
 <pre><code class="language-javascript">function test() {
     console.log(c)
@@ -548,7 +548,7 @@ test2()
 console.log(a);
 </code></pre>
 <p>这段代码运行在严格模式下，这里说一下运行结果，a无法打印，运行到这里会报错。</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/6/3/16b1de545d2b96da?w=492&amp;h=119&amp;f=png&amp;s=7186" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/6/3/16b1de545d2b96da?w=492&amp;h=119&amp;f=png&amp;s=7186" alt="" loading="lazy"></figure>
 <p>对运行结果存在疑惑？或许本文能够令你稍解疑惑。</p>
 <h2 id="iife的成立">IIFE的成立</h2>
 <p>IIFE可以看做是两部分构成，前半部分定义了一个函数表达式，后半部分的括号这是表示运行这个函数。拿一个具体的例子描述一下。</p>
@@ -662,7 +662,7 @@ Object.defineProperty(a, 'name', {
 
 </code></pre>
 <p><a href="https://jsbin.com/xeleqef/1/edit?js,console">代码传送门</a></p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/28/16afebfc6ecf566a?w=637&amp;h=111&amp;f=png&amp;s=16686" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/28/16afebfc6ecf566a?w=637&amp;h=111&amp;f=png&amp;s=16686" alt="" loading="lazy"></figure>
 <blockquote>
 <p>Tips：这段代码中有一个关于 writable 的小细节，将在数据描述符小节中解释。</p>
 </blockquote>
@@ -899,11 +899,11 @@ console.log('h.name', h.name);  // 'i' 会调用h上的get打印'h get调用'
 <p>在查看标准解释是，有几处理解的不是很明白，故使用几个demo对自己的理解做了验证</p>
 <h3 id="b应该是什么值">b应该是什么值</h3>
 <p>先看b不是对象是什么情况<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt="" loading="lazy"></p>
 <p>从上面的结果可以看到报错了，而且错误提示很明显的提示右侧的值不是对象，这是第1步检测报的错，那么如果是对象，而不是函数对象又会是什么情况呢？</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt="" loading="lazy"></figure>
 <p>嗯，没错，对象也报错了，这次的错误是右侧的值不可调用，即不是函数，这应是第4步检测报的错了。根据上面的步骤试试给对象设置Symbol.hasInstance属性</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt=""><br>
+<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt="" loading="lazy"><br>
 这一次没有报错，检测正常进行了，且返回了在函数中定义的结果，根据上面的步骤和代码验证，可以得出右侧的值可以是设置了Symbol.hasInstance属性的对象。且检测的结果会被右侧值定义的Symbol.hasInsyance函数拦截成函数返回的结果。</p>
 <p>右侧是函数的情况就是比觉正常的返回了，需要明确的一点是函数是不能直接设置Symbol.hasInstance属性的，具体原因，感兴趣的可以继续查阅资料。到这里可以得出结论，b必须是设置了Symbol的对象或者函数，否则会报错。</p>
 <h3 id="被-dind-包装过的函数依然会返回原函数原型检测结果">被 dind 包装过的函数依然会返回原函数原型检测结果</h3>
@@ -941,14 +941,14 @@ console.log('c instanceof s', c instanceof s);   // true
 <p>原型和原型链，说是两个词，其实理解一个就可以了。这两个概念是同时存在的，不可能抛开一个去谈论另外一个，或者说这两个概念结合在一起才会发挥作用，甚至原型的存在是因为有原型链的存在，不在原型链上的原型只能称之为对象。</p>
 <h2 id="原型链">原型链</h2>
 <p>先来说说原型链是个什么东东，说起链我们现在脑海中描绘一下自己对链这个字的第一反应是什么，是社会我大哥的大金链？<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="">是二哈的大狗链？<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt=""><br>
-还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="" loading="lazy">是二哈的大狗链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt="" loading="lazy"><br>
+还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt="" loading="lazy"></p>
 <p>皮一下，下面我们正经说原型链，原型链从本质上来讲应该是个链表结构，也就是和上面的单链表有点像，我们把上图中的next换成__proto__属性，data换成键值对集合，这样经常在控制台输出对象的同学会不会有点熟悉的感觉？</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt="" loading="lazy"></figure>
 <h3 id="举个栗子">举个栗子</h3>
 <p>下面举个庸俗的例子，有一个对象人，有move和sleep属性，人中又有男人具有sex属性，男人中又有一类人程序员具有code和hair（其值为less）属性，现在我们想用一个对象来表达程序员，那么这个对象应该同时具备人，男人，程序员的属性，我们用原型链来表达他们，就像这样</p>
-<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt=""></figure>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt="" loading="lazy"></figure>
 <p>原型链具备的特征是能够从下往上查找属性，利于当我在要programmer对象中读取sex属性时，浏览器引擎会先在programmer对象中查找该属性，如果未查找到，那么通过其__proto__找到man对象，在man对象中去查找，在man对象中查找到了sex属性，并获取其值‘man’将其返回，就完成了一次属性查找。同理如果要通过programmer获取move，也是这样层层查找自身属性并通过__proto__往上查找。</p>
 <p>程序员的睡觉时间与一般人不同，因此需要定义自己的sleep方法，直接在programmer对象上设置sleep属性，那么programmer对象就具有了自己的sleep属性，当通过程序员获取sleep属性时获取到的就是自己定义的sleep属性，也就是说同样都是person，此刻的programmer的sleep已不是peroson的sleep。</p>
 <h3 id="原型链的特征">原型链的特征</h3>
@@ -992,12 +992,12 @@ Programmer.prototype = new Man();
 var programmer = new Programmer();
 console.log(programmer);
 </code></pre>
-<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt=""></figure>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt="" loading="lazy"></figure>
 <p>从上面的代码的运行结果中我们不难看出，prototype的作用只是在特定场景下得到的对象的原型（还有其他多种指定对象原型的方式，下面另开小节说明），且这里指定的不仅仅是原型，当指定man为programmer的原型时，同时也意味着man的原型person及person的原型Object这一整个链都被指定给了programmer。</p>
 <h3 id="__proto__">__proto__</h3>
 <p>上面的运行结果中我们可以看到，在每个对象上都有一个属性__proto__，这个属性不是我们指定的，而且这只是在大多数浏览器中这个属性名是__proto__，这个属性名的作用就是记录对象的原型指向。虽然不一定每个浏览器中都是这个属性名，但是相同的是他们必然都有一个属性用来记录对象的原型。当我们要获取一个对象的原型时应该使用ES的标准API: Object.getPrototypeOf()或者Reflect.getPrototypeOf()（ES6），来获取。</p>
 <h3 id="原型链关系图">原型链关系图</h3>
-<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt=""></figure>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt="" loading="lazy"></figure>
 <p>话说本来只是随便画画的，结果就成了你上面看到那个样子，让我们大家一起来找茬，发现有哪个等式不成立的欢迎在评论区打脸。另表达下个人的对JS中的对象起点观念，我认为是Object.prototype指向的这个对象，不认为是null，不接受反驳（傲娇脸）。关于这一点，这里解释一下，在JS中所有对象的原型链追到最后应该都是Object.prototype指向的对象（通过使用下面的指定原型对象为null的方式的对象除外），上图中所表现的想表明的是具备实际使用意义的原型链起点。</p>
 <p>Object.prototype.__proto__的值是null也就是表明Object.prototype对象是存在这个属性的，因为它不是undefined，但是这个值应该被理解为一个原型链的结束符号更为准一些，使用这个符号是为了能够更好的实现JS引擎，而不是语言具备的标准特性。</p>
 <h2 id="指定对象原型的几种方式">指定对象原型的几种方式</h2>
@@ -1087,7 +1087,7 @@ console.log('a的原型是b', Object.getPrototypeOf(c) === b);  //true
 outer();
 </code></pre>
 <p>上面的代码是否产生了闭包呢？我们来看下调试工具中是怎么体现的</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/4/13/16a161b699ff44fb?w=765&amp;h=461&amp;f=png&amp;s=44562" alt="" loading="lazy"></figure>
 <p>如上图可见在outer函数的结尾大括号处打上断点，可以查看outer函数的作用域（结尾处打断点可以更准确的获得所用变量的值），上图中标识outer处的scope表示的就是断点处所在作用域的变量，Locale就是outer函数作用域中定义的变量集合，Global表示的可访问的全局变量集合。</p>
 <p>outer的Scope中的locale里面可以看到变量outerVar，inner，其中outerVar的值是字符串outer，inner的值是一个函数。</p>
 <p>展开inner函数可以看到该函数的[[Scopes]]，这里没由Local类型的变量，但是有一个Closure，这里没有Locale的原因是inner函数并没有定义变量，而是引用了其父作用域outer函数作用域中的outerVal变量，我们可以在Closure中看到outerVal，这个Closure就是表示的该函数引用的其他局部作用域的变量集合，当一个函数的[[Scopes]]中出现Closure就表示这个函数及其所引用的其他局部作用域变量共同形成了一个闭包。</p>
@@ -1118,7 +1118,7 @@ for(var i=0; i&lt;10000; i++) {
 <p>这段代码中是存在问题的，下面说下具体什么问题。</p>
 <h3 id="共享闭包">共享闭包</h3>
 <p>上面的代码中存在内存泄漏问题，下面通过调试工具看下这段代码的情况：</p>
-<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt=""></figure>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c6f7390498b7?w=893&amp;h=622&amp;f=png&amp;s=80058" alt="" loading="lazy"></figure>
 <p>通过上图可见consoleOuterVal和inner函数的[[Scopes]]中均出现了Closure，且其保存的变量均为outerVal，inner中没用引用outerVal变量，怎么会该变量会出现在其Closure中呢？这实际上是在得到函数Closure中的变量时，JS引擎会把作用域下的所有闭包变量放在一起，在该作用域下定义的函数都会得到一个相同的Closure。这样的话上面的inner也会拥有和consoleOuterVal函数一样变量引用，且该变量一直无法释放，随着循环的增加，内存自然就不够用了。</p>
 <p>关于共享闭包的 更多细节探讨可访问<a href="https://juejin.im/post/5c723d90f265da2dc0065bdb">前端小秘密系列之闭包</a>（非本人，这里不要脸的引用下）。</p>
 <h3 id="不建议使用eval的原因">不建议使用eval的原因</h3>
@@ -1139,7 +1139,7 @@ for(var i=0; i&lt;10000; i++) {
 
 outer();
 </code></pre>
-<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt=""></figure>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/4/14/16a1c862475a8c27?w=885&amp;h=622&amp;f=png&amp;s=61058" alt="" loading="lazy"></figure>
 <p>具体的原因是，js 引擎在解析包含有eval的函数时会保留该函数中的所有可以引用的变量保留在Clousre，因为根本不知道eval会插入什么样的语句，在该语句中会使用什么变量也是不确定的，所以函数中的所有可以引用的变量都会保留，那么在该函数中定义的其他函数也会保留该函数的所有可引用变量，容易造成内存浪费，同时导致内存泄漏的可能性又增大很多。</p>
 <h2 id="let块级作用域产生的闭包">let块级作用域产生的闭包</h2>
 <p>上面说了那么多，总结下闭包的出现条件，及其特点：</p>
@@ -1150,12 +1150,12 @@ outer();
 <li>同一局部作用域下定义的函数产生的Closure共享</li>
 </ol>
 <p>下面是文章开头代码的Scope情况：</p>
-<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt=""></figure>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ab65d07aa4d5?w=930&amp;h=608&amp;f=png&amp;s=47256" alt="" loading="lazy"></figure>
 <p>上图中let定义的变量a出现在了getBlockA函数的作用域中，只是这个作用域既不是Local，也不是Closure，而是Block，Block表示的是块级作用域，用let和const定义的变量才会存在块级作用域。这个块级作用域和局部作用域（函数作用域）是没有太大区别的，不同之处在于，块级作用域仅仅约束let和const定义的变量的作用范围，而局部作用域没有这个限制，可以约束所有该作用域定义的变量。</p>
 <p>在这个示例中变量a作为块级作用域的变量，在getBlockA函数的作用域（局部作用域）中被引用了，是符合闭包出现的条件的。</p>
-<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt=""></figure>
+<figure data-type="image" tabindex="5"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3ae1f4d2e838b?w=735&amp;h=462&amp;f=png&amp;s=38956" alt="" loading="lazy"></figure>
 <p>如上图所示，变量变量a被保留了，因为在全局函数getBlockA中被引用了，getBlockA是全局变量，全局变量不会被回收，这也就导致了被其引用的变量a会一直被保存在内存中不会被回收。</p>
-<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt=""></figure>
+<figure data-type="image" tabindex="6"><img src="https://user-gold-cdn.xitu.io/2019/4/20/16a3b38a086ab414?w=917&amp;h=527&amp;f=png&amp;s=53590" alt="" loading="lazy"></figure>
 <p>如上图所示，getBlockA和getBlockB中的Block保留的变量是相同的，且这两个函数分别只引用了其中一个变量，这说明在块级作用域中定义的函数也会存在闭包的共享。</p>
 <p>所以有let或const定义的变量而产生的块级作用域中定义的函数完全可以认为是闭包。</p>
 <h2 id="js中函数作用域和块级作用域的区别">js中函数作用域和块级作用域的区别</h2>

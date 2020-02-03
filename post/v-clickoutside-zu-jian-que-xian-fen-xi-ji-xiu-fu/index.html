@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>一个开源组件 bug 引发的分析 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -105,7 +105,7 @@
             <div class="post-content-wrapper">
               <div class="post-content">
                 <p>这是一个悲伤的故事。某日清晨，距离版本转测还剩一天，切图仔的我正按照计划有条不紊的画页面。当我点击一个下拉弹框组件中分页组件页数过多而出现的向后 5 页省略号时，悲剧开始了，弹框被收回了。情景再现<br>
-<img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/bug%26analysis/bug.gif" alt=""></p>
+<img src="https://yanyuanlu-1253240768.cos.ap-chengdu.myqcloud.com/bug%26analysis/bug.gif" alt="" loading="lazy"></p>
 <h2 id="问题">问题</h2>
 <p>问题的表象很简单，使用的是组件库的下拉弹窗组件，在组件中使用到了分页组件，当点击分页组件的向后 5 页快速跳转时，弹窗被收回了。我们的预期是能够继续操作的，只有点击弹框外部时，弹窗才会被收回。</p>
 <h2 id="分析">分析</h2>

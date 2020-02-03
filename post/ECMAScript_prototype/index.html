@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript基础系列之原型链 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -112,14 +112,14 @@
 <p>原型和原型链，说是两个词，其实理解一个就可以了。这两个概念是同时存在的，不可能抛开一个去谈论另外一个，或者说这两个概念结合在一起才会发挥作用，甚至原型的存在是因为有原型链的存在，不在原型链上的原型只能称之为对象。</p>
 <h2 id="原型链">原型链</h2>
 <p>先来说说原型链是个什么东东，说起链我们现在脑海中描绘一下自己对链这个字的第一反应是什么，是社会我大哥的大金链？<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="">是二哈的大狗链？<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt=""><br>
-还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a8887f9ac44070?w=350&amp;h=400&amp;f=jpeg&amp;s=17148" alt="" loading="lazy">是二哈的大狗链？<br>
+<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a888f25bcd41be?w=370&amp;h=452&amp;f=jpeg&amp;s=27046" alt="" loading="lazy"><br>
+还是数据结构链表？<img src="https://user-gold-cdn.xitu.io/2019/5/5/16a88a9c0a55408c?w=895&amp;h=144&amp;f=png&amp;s=5635" alt="" loading="lazy"></p>
 <p>皮一下，下面我们正经说原型链，原型链从本质上来讲应该是个链表结构，也就是和上面的单链表有点像，我们把上图中的next换成__proto__属性，data换成键值对集合，这样经常在控制台输出对象的同学会不会有点熟悉的感觉？</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8d8c2afcf90af?w=931&amp;h=129&amp;f=png&amp;s=5358" alt="" loading="lazy"></figure>
 <h3 id="举个栗子">举个栗子</h3>
 <p>下面举个庸俗的例子，有一个对象人，有move和sleep属性，人中又有男人具有sex属性，男人中又有一类人程序员具有code和hair（其值为less）属性，现在我们想用一个对象来表达程序员，那么这个对象应该同时具备人，男人，程序员的属性，我们用原型链来表达他们，就像这样</p>
-<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt=""></figure>
+<figure data-type="image" tabindex="2"><img src="https://user-gold-cdn.xitu.io/2019/5/6/16a8dce7293242ef?w=676&amp;h=68&amp;f=png&amp;s=11193" alt="" loading="lazy"></figure>
 <p>原型链具备的特征是能够从下往上查找属性，利于当我在要programmer对象中读取sex属性时，浏览器引擎会先在programmer对象中查找该属性，如果未查找到，那么通过其__proto__找到man对象，在man对象中去查找，在man对象中查找到了sex属性，并获取其值‘man’将其返回，就完成了一次属性查找。同理如果要通过programmer获取move，也是这样层层查找自身属性并通过__proto__往上查找。</p>
 <p>程序员的睡觉时间与一般人不同，因此需要定义自己的sleep方法，直接在programmer对象上设置sleep属性，那么programmer对象就具有了自己的sleep属性，当通过程序员获取sleep属性时获取到的就是自己定义的sleep属性，也就是说同样都是person，此刻的programmer的sleep已不是peroson的sleep。</p>
 <h3 id="原型链的特征">原型链的特征</h3>
@@ -163,12 +163,12 @@ Programmer.prototype = new Man();
 var programmer = new Programmer();
 console.log(programmer);
 </code></pre>
-<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt=""></figure>
+<figure data-type="image" tabindex="3"><img src="https://user-gold-cdn.xitu.io/2019/5/7/16a92bf9b84fd91c?w=620&amp;h=216&amp;f=png&amp;s=13936" alt="" loading="lazy"></figure>
 <p>从上面的代码的运行结果中我们不难看出，prototype的作用只是在特定场景下得到的对象的原型（还有其他多种指定对象原型的方式，下面另开小节说明），且这里指定的不仅仅是原型，当指定man为programmer的原型时，同时也意味着man的原型person及person的原型Object这一整个链都被指定给了programmer。</p>
 <h3 id="__proto__">__proto__</h3>
 <p>上面的运行结果中我们可以看到，在每个对象上都有一个属性__proto__，这个属性不是我们指定的，而且这只是在大多数浏览器中这个属性名是__proto__，这个属性名的作用就是记录对象的原型指向。虽然不一定每个浏览器中都是这个属性名，但是相同的是他们必然都有一个属性用来记录对象的原型。当我们要获取一个对象的原型时应该使用ES的标准API: Object.getPrototypeOf()或者Reflect.getPrototypeOf()（ES6），来获取。</p>
 <h3 id="原型链关系图">原型链关系图</h3>
-<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt=""></figure>
+<figure data-type="image" tabindex="4"><img src="https://user-gold-cdn.xitu.io/2019/5/8/16a9316a9b762bc2?w=822&amp;h=482&amp;f=png&amp;s=61899" alt="" loading="lazy"></figure>
 <p>话说本来只是随便画画的，结果就成了你上面看到那个样子，让我们大家一起来找茬，发现有哪个等式不成立的欢迎在评论区打脸。另表达下个人的对JS中的对象起点观念，我认为是Object.prototype指向的这个对象，不认为是null，不接受反驳（傲娇脸）。关于这一点，这里解释一下，在JS中所有对象的原型链追到最后应该都是Object.prototype指向的对象（通过使用下面的指定原型对象为null的方式的对象除外），上图中所表现的想表明的是具备实际使用意义的原型链起点。</p>
 <p>Object.prototype.__proto__的值是null也就是表明Object.prototype对象是存在这个属性的，因为它不是undefined，但是这个值应该被理解为一个原型链的结束符号更为准一些，使用这个符号是为了能够更好的实现JS引擎，而不是语言具备的标准特性。</p>
 <h2 id="指定对象原型的几种方式">指定对象原型的几种方式</h2>

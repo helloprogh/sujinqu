@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ECMAScript基础之变量提升 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -184,7 +184,7 @@ test();
 test();
 </code></pre>
 <p>嗯，这段代码会抛错，就像这样<br>
-<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/6/18/16b6af974e857004?w=367&amp;h=48&amp;f=png&amp;s=3708" alt="" loading="lazy"></p>
 <p>现在去网上搜一下关于 let 的变量提升的内容，仍然会看到很多说 let 不存在变量声明提升的说法，给出的理由是，既然提升了，为什么在声明之前使用该变量会报错呢？下面就说一说为什么认为 let 是存在提升的。 考虑下面代码：</p>
 <pre><code class="language-javascript">function test() {
     console.log(c)

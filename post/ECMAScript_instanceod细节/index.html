@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript基础系列之instanceof细节 | 苏进取</title>
 <meta name="description" content="凝视深渊" />
-<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1575814981628">
+<link rel="shortcut icon" href="https://helloprogh.github.io/sujinqu/favicon.ico?v=1580726656382">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://helloprogh.github.io/sujinqu/styles/main.css">
@@ -29,7 +29,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://helloprogh.github.io/sujinqu">
-  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1575814981628" alt="">
+  <img class="avatar" src="https://helloprogh.github.io/sujinqu/images/avatar.png?v=1580726656382" alt="">
   </a>
   <h1 class="site-title">
     苏进取
@@ -137,11 +137,11 @@
 <p>在查看标准解释是，有几处理解的不是很明白，故使用几个demo对自己的理解做了验证</p>
 <h3 id="b应该是什么值">b应该是什么值</h3>
 <p>先看b不是对象是什么情况<br>
-<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt=""></p>
+<img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac10ee3c114f24?w=624&amp;h=199&amp;f=png&amp;s=12679" alt="" loading="lazy"></p>
 <p>从上面的结果可以看到报错了，而且错误提示很明显的提示右侧的值不是对象，这是第1步检测报的错，那么如果是对象，而不是函数对象又会是什么情况呢？</p>
-<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt=""></figure>
+<figure data-type="image" tabindex="1"><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac115f7fff5e84?w=520&amp;h=107&amp;f=png&amp;s=6941" alt="" loading="lazy"></figure>
 <p>嗯，没错，对象也报错了，这次的错误是右侧的值不可调用，即不是函数，这应是第4步检测报的错了。根据上面的步骤试试给对象设置Symbol.hasInstance属性</p>
-<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt=""><br>
+<p><img src="https://user-gold-cdn.xitu.io/2019/5/16/16ac120c4b1b2c87?w=662&amp;h=356&amp;f=png&amp;s=27027" alt="" loading="lazy"><br>
 这一次没有报错，检测正常进行了，且返回了在函数中定义的结果，根据上面的步骤和代码验证，可以得出右侧的值可以是设置了Symbol.hasInstance属性的对象。且检测的结果会被右侧值定义的Symbol.hasInsyance函数拦截成函数返回的结果。</p>
 <p>右侧是函数的情况就是比觉正常的返回了，需要明确的一点是函数是不能直接设置Symbol.hasInstance属性的，具体原因，感兴趣的可以继续查阅资料。到这里可以得出结论，b必须是设置了Symbol的对象或者函数，否则会报错。</p>
 <h3 id="被-dind-包装过的函数依然会返回原函数原型检测结果">被 dind 包装过的函数依然会返回原函数原型检测结果</h3>
